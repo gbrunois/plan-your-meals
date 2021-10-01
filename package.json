@@ -19,6 +19,6 @@
   },
   "homepage": "https://github.com/gbrunois/plan-your-meals#readme",
   "devDependencies": {
-    "lerna": "^3.15.0"
+    "lerna": "^3.22.1"
   }
 }

@@ -2,7 +2,7 @@
   "name": "@plan-your-meals/functions",
   "description": "whats for dinner firebase functions",
   "engines": {
-    "node": "8"
+    "node": "14"
   },
   "scripts": {
     "lint": "tslint --project tsconfig.json",
@@ -23,38 +23,38 @@
   },
   "main": "lib/src/index.js",
   "dependencies": {
-    "@google-cloud/firestore": "^3.5.1",
-    "actions-on-google": "^2.12.0",
-    "axios": "^0.19.2",
+    "@google-cloud/firestore": "^3.8.6",
+    "actions-on-google": "^2.14.0",
+    "axios": "^0.22.0",
     "cors": "^2.8.5",
     "dialogflow": "1.2.0",
-    "dotenv": "^8.2.0",
+    "dotenv": "^8.6.0",
     "express": "4.17.1",
-    "firebase": "^7.14.2",
-    "firebase-admin": "^8.11.0",
-    "firebase-functions": "^3.6.1",
-    "lodash": "^4.17.15",
+    "firebase": "^7.24.0",
+    "firebase-admin": "^8.13.0",
+    "firebase-functions": "^3.15.7",
+    "lodash": "^4.17.21",
     "morgan": "^1.10.0",
-    "mustache": "^4.0.0",
-    "nodemailer": "^6.4.4"
+    "mustache": "^4.2.0",
+    "nodemailer": "^6.6.5"
   },
   "devDependencies": {
     "@types/dotenv": "^8.2.0",
     "@types/express": "4.17.6",
     "@types/express-serve-static-core": "4.17.6",
     "@types/jest": "^24.9.1",
-    "@types/lodash": "^4.14.137",
-    "@types/morgan": "^1.9.0",
-    "@types/mustache": "^4.0.1",
-    "@types/node": "^12.7.2",
-    "@types/nodemailer": "^6.4.0",
+    "@types/lodash": "^4.14.175",
+    "@types/morgan": "^1.9.3",
+    "@types/mustache": "^4.1.2",
+    "@types/node": "^12.20.27",
+    "@types/nodemailer": "^6.4.4",
     "babel-jest": "^24.9.0",
-    "cpy-cli": "^3.1.0",
+    "cpy-cli": "^3.1.1",
     "jest": "^24.9.0",
-    "prettier": "^1.18.2",
-    "ts-jest": "^24.0.2",
-    "ts-node": "^8.3.0",
-    "tslint": "^5.19.0",
-    "typescript": "^3.8"
+    "prettier": "^1.19.1",
+    "ts-jest": "^24.3.0",
+    "ts-node": "^8.10.2",
+    "tslint": "^5.20.1",
+    "typescript": "^3.9.10"
   }
 }
