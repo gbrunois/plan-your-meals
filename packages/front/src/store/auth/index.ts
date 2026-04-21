@@ -37,12 +37,35 @@ export default {
         })
       )
     },
-    watchUserAuthenticated({ commit }: any) {
-      commit('setWaitForAuthenticatedState', true)
-      authService.onAuthStateChanged((user: firebase.User | null) => {
-        commit('setUser', user)
+    watchUserAuthenticated({ commit, dispatch }: any) {
+      if (import.meta.env.VITE_SKIP_AUTH === 'true') {
+        console.info('Mock Auth enabled. Skipping Firebase Authentication.')
+        const mockUser = {
+          uid: 'mock-user-123',
+          displayName: 'Dev User',
+          email: 'dev@example.com',
+        }
+        commit('setUser', mockUser)
         commit('setWaitForAuthenticatedState', false)
-      })
+        return
+      }
+      commit('setWaitForAuthenticatedState', true)
+      authService
+        .getRedirectResult()
+        .then((result) => {
+          if (result.user) {
+            commit('setUser', result.user)
+          }
+        })
+        .catch((error) => {
+          console.error('Redirect sign-in error:', error)
+        })
+        .finally(() => {
+          authService.onAuthStateChanged((user: firebase.User | null) => {
+            commit('setUser', user)
+            commit('setWaitForAuthenticatedState', false)
+          })
+        })
     },
     logout({ commit, dispatch }: any) {
       return dispatch('days/unsubscribe', undefined, { root: true }).then(() =>

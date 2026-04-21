@@ -1,6 +1,6 @@
 import { DayMenu } from './day-menu'
 import { MenuDate } from './menu-date'
-import { IDayResponse } from './day-response.type'
+import type { IDayResponse } from './day-response.type'
 
 export class DayMenuBuilder {
   public static aMenuDay(date: MenuDate): DayMenuBuilder {

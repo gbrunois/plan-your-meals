@@ -1,14 +1,18 @@
+import firebase from 'firebase/compat/app'
+import { database } from '../firebaseService'
 import {
-  IFirestoreSharing,
   Sharing,
   SharingBuilder,
-  IFirestorePendingSharing,
   PendingSharingBuilder,
   PendingSharing,
-} from './sharing.type'
+} from '../sharings/sharing.type'
+import type {
+  IFirestoreSharing,
+  IFirestorePendingSharing,
+} from '../sharings/sharing.type'
 import axios from 'axios'
 import { auth } from '../firebaseService'
-import { IFirestorePlanning } from '../plannings/planning.type'
+import type { IFirestorePlanning } from '../plannings/planning.type'
 import { genericConverter } from '../api'
 import config from '../../../config'
 

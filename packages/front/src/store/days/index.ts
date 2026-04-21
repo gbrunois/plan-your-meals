@@ -75,35 +75,57 @@ const actions = {
     commit('fetchDays', { beginDate, endDate })
     return new Promise<DayMenu[]>((resolve, reject) => {
       try {
-        const unsubscribe = Api.getInstance().planningService.watchPrimaryPlanningRef(
-          rootGetters['auth/uid'],
-          (planningRef: firebase.firestore.DocumentReference | undefined) => {
-            if (planningRef === undefined) {
-              console.error('unknown primary planning')
-              throw new Error('unknown primary planning')
-            } else {
-              unsubscribe()
-              state.planningRef = planningRef
-              state.unsubscribe = Api.getInstance().dayService.watchPeriod(
-                planningRef,
-                beginDate,
-                endDate,
-                (days) => {
-                  resolve(days)
-                  commit('fetchDaysSuccess', { beginDate, endDate, days })
-                },
-                (error: Error) => {
+        const unsubscribe =
+          Api.getInstance().planningService.watchPrimaryPlanningRef(
+            rootGetters['auth/uid'],
+            async (
+              planningRef: firebase.firestore.DocumentReference | undefined
+            ) => {
+              if (planningRef === undefined) {
+                console.info('Profile not found, initializing...')
+                const authUser = rootGetters['auth/user']
+                if (authUser) {
+                  try {
+                    await Api.getInstance().planningService.initializeUser(
+                      authUser
+                    )
+                    // The onSnapshot listener will trigger again once the doc is created
+                  } catch (error) {
+                    console.error('Failed to initialize user profile:', error)
+                    commit('fetchDaysFail', { error })
+                    reject(error)
+                  }
+                } else {
+                  console.error('User is not authenticated')
+                  const error = new Error('User is not authenticated')
                   commit('fetchDaysFail', { error })
                   reject(error)
                 }
-              )
+              } else {
+                if (state.unsubscribe) {
+                  state.unsubscribe()
+                }
+                state.planningRef = planningRef
+                state.unsubscribe = Api.getInstance().dayService.watchPeriod(
+                  planningRef,
+                  beginDate,
+                  endDate,
+                  (days) => {
+                    resolve(days)
+                    commit('fetchDaysSuccess', { beginDate, endDate, days })
+                  },
+                  (error: Error) => {
+                    commit('fetchDaysFail', { error })
+                    reject(error)
+                  }
+                )
+              }
+            },
+            (error: Error) => {
+              commit('fetchDaysFail', { error })
+              reject(error)
             }
-          },
-          (error: Error) => {
-            commit('fetchDaysFail', { error })
-            reject(error)
-          }
-        )
+          )
       } catch (error) {
         commit('fetchDaysFail', { error })
         reject(error)

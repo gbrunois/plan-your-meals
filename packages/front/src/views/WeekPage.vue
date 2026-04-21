@@ -7,22 +7,19 @@
     }"
   >
     <v-col class="pa-0">
-      <v-list two-line>
-        <template v-for="(item, index) in items">
-          <v-list-item :key="item.index" ripple @click="openPopupDay(item)">
-            <v-list-item-content>
-              <v-list-item-title>{{
-                item.date.toLongFormat()
-              }}</v-list-item-title>
-              <v-list-item-subtitle>Midi {{ item.lunch }}</v-list-item-subtitle>
-              <v-list-item-subtitle
-                >Soir {{ item.dinner }}</v-list-item-subtitle
-              >
-            </v-list-item-content>
+      <v-list lines="two">
+        <template v-for="(item, index) in items" :key="item.date.toString()">
+          <v-list-item @click="openPopupDay(item)">
+            <v-list-item-title>{{
+              item.date.toLongFormat()
+            }}</v-list-item-title>
+            <v-list-item-subtitle>Midi {{ item.lunch }}</v-list-item-subtitle>
+            <v-list-item-subtitle
+              >Soir {{ item.dinner }}</v-list-item-subtitle
+            >
           </v-list-item>
           <v-divider
             v-if="index + 1 < items.length"
-            :key="`divider-${index}`"
           ></v-divider>
         </template>
       </v-list>
@@ -31,12 +28,9 @@
 </template>
 
 <script>
-import { DayService } from '@/api/days/day.service'
-import { MenuDate } from '@/api/days/menu-date'
 import { daysService } from '@/services/days.service'
 import { getDateFromUrlParamsOrToday } from '@/services/router.service'
-import WeekNavigation from './components/WeekNavigation.vue'
-import { DEFAULT_MAIN_PAGE_PATH, WEEK_PAGE_NAME } from '../router'
+import { WEEK_PAGE_NAME } from '../router'
 
 export default {
   name: WEEK_PAGE_NAME,

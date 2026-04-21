@@ -22,9 +22,10 @@ import { IFirestorePlanning } from '@/api/plannings/planning.type'
 async function getPrimaryPlanningRef(
   rootGetters: any
 ): Promise<firestore.DocumentReference<IFirestorePlanning>> {
-  const userPrimaryPlanningRef = await Api.getInstance().planningService.getPrimaryPlanningRef(
-    rootGetters['auth/uid']
-  )
+  const userPrimaryPlanningRef =
+    await Api.getInstance().planningService.getPrimaryPlanningRef(
+      rootGetters['auth/uid']
+    )
   if (userPrimaryPlanningRef === undefined) {
     throw new Error('unknown primary planning')
   }

@@ -65,9 +65,10 @@ const addNewSharing: IMutation<IState, string> = async (state, email) => {
     return
   }
   // pending sharing have been deleted
-  const foundInPendingSharingsToRemove = state.pendingState.pendingSharingToRemove.findIndex(
-    (x) => x.userEmail === email
-  )
+  const foundInPendingSharingsToRemove =
+    state.pendingState.pendingSharingToRemove.findIndex(
+      (x) => x.userEmail === email
+    )
   if (foundInPendingSharingsToRemove !== -1) {
     const [deleted] = state.pendingState.pendingSharingToRemove.splice(
       foundInPendingSharingsToRemove,

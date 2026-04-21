@@ -1,5 +1,5 @@
-import firebase from 'firebase/app'
-import 'firebase/auth'
+import firebase from 'firebase/compat/app'
+import 'firebase/compat/auth'
 import { auth } from '../firebaseService'
 
 class AuthService {
@@ -16,6 +16,10 @@ class AuthService {
       .signInWithRedirect(provider)
       .catch((error: any) => console.error(error))
     // TODO display error to client
+  }
+
+  public getRedirectResult(): Promise<firebase.auth.UserCredential> {
+    return auth.getRedirectResult()
   }
 
   public signOut() {

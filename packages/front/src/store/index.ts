@@ -2,9 +2,8 @@ import auth from '@/store/auth'
 import days from '@/store/days'
 import sharings from '@/store/sharings'
 import plannings from '@/store/plannings'
-import Vue from 'vue'
-import Vuex from 'vuex'
-import { IRootState } from './types'
+import { createStore } from 'vuex'
+import type { IRootState } from './types'
 
 const rootState: IRootState = {
   currentWeekPage: '',
@@ -22,8 +21,7 @@ const getters = {
   },
 }
 
-Vue.use(Vuex)
-const store = new Vuex.Store<IRootState>({
+const store = createStore<IRootState>({
   state: rootState,
   mutations,
   getters,

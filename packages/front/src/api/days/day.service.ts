@@ -1,8 +1,8 @@
-import firebase from 'firebase/app'
+import firebase from 'firebase/compat/app'
 import { DayMenu } from './day-menu'
 import { DayMenuBuilder } from './day-menu.builder'
 import { MenuDate } from './menu-date'
-import { IDayResponse } from './day-response.type'
+import type { IDayResponse } from './day-response.type'
 
 export class DayService {
   public watchPeriod(
