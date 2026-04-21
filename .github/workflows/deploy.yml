@@ -5,6 +5,11 @@ on:
     branches:
       - master
       - develop
+  pull_request:
+    branches:
+      - master
+      - develop
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
@@ -35,13 +40,13 @@ jobs:
         run: npm run build
 
       - name: Deploy to Firebase (Dev)
-        if: github.ref == 'refs/heads/develop'
+        if: github.ref == 'refs/heads/develop' || github.event_name == 'workflow_dispatch'
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_DEV_TOKEN }}
         run: npx firebase-tools deploy -f --project "whats-for-dinner-id" --token "$FIREBASE_TOKEN"
 
       - name: Deploy to Firebase (Prod)
-        if: github.ref == 'refs/heads/master'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_PROD_TOKEN }}
         run: npx firebase-tools deploy -f --project "plan-your-meals" --token "$FIREBASE_TOKEN"
