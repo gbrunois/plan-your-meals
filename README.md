@@ -16,10 +16,6 @@ Plan your meals is an application to plan the meals of the week
 
 [README](https://github.com/gbrunois/plan-your-meals/blob/master/packages/functions/README.md)
 
-## Dialogflow e2e
-
-[README](https://github.com/gbrunois/plan-your-meals/blob/master/packages/dialogflow-e2e/README.md)
-
 # Installation
 
 ## Firebase
