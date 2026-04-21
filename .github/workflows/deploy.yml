@@ -1,0 +1,47 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '14'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm install
+          npm run bootstrap
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to Firebase (Dev)
+        if: github.ref == 'refs/heads/develop'
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_DEV_TOKEN }}
+        run: npx firebase-tools deploy -f --project "whats-for-dinner-id" --token "$FIREBASE_TOKEN"
+
+      - name: Deploy to Firebase (Prod)
+        if: github.ref == 'refs/heads/master'
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_PROD_TOKEN }}
+        run: npx firebase-tools deploy -f --project "plan-your-meals" --token "$FIREBASE_TOKEN"

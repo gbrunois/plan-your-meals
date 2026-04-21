@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/gbrunois/plan-your-meals.svg?branch=master)](https://travis-ci.com/gbrunois/plan-your-meals)
+[![CI/CD](https://github.com/gbrunois/plan-your-meals/actions/workflows/deploy.yml/badge.svg)](https://github.com/gbrunois/plan-your-meals/actions/workflows/deploy.yml)
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
@@ -25,7 +25,7 @@ Plan your meals is an application to plan the meals of the week
 - Enable billing on Google Cloud Project
 - Configure Consent Screen [https://console.cloud.google.com/apis/credentials/consent]
 
-## Continous delivery
+## Continuous delivery
 
-- Linked with Travis CI
-  ...Generate firebase API KEY: [How-to](https://docs.travis-ci.com/user/deployment/firebase/)
+- Linked with GitHub Actions
+  ...Generate firebase API KEY: [How-to](https://firebase.google.com/docs/cli#sign-in-test-token)
