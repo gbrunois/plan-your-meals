@@ -40,10 +40,10 @@ export default {
     watchUserAuthenticated({ commit, dispatch }: any) {
       if (import.meta.env.VITE_SKIP_AUTH === 'true') {
         console.info(
-          'Mock Auth enabled. Committing mock user but allowing Firebase SDK to initialize.'
+          'Mock Auth enabled. Committing mock user'
         )
         const mockUser = {
-          uid: 'UbRERh5AOiejizpkyPhVND179sf1',
+          uid: 'test-user-id',
           displayName: 'Dev User',
           email: 'dev@example.com',
         }
