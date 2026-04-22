@@ -10,11 +10,12 @@ import SignInPage from './views/SignIn.vue'
 import TermsOfServicePage from './views/TermsOfService.vue'
 import WeekPage from './views/WeekPage.vue'
 
-export const SIGNIN_PAGE_NAME = 'sign-in'
-export const WEEK_PAGE_NAME = 'week'
-
-export const DEFAULT_MAIN_PAGE_PATH = '/week'
-export const DEFAULT_MAIN_PAGE_NAME = 'mainWeek'
+import {
+  SIGNIN_PAGE_NAME,
+  WEEK_PAGE_NAME,
+  DEFAULT_MAIN_PAGE_PATH,
+  DEFAULT_MAIN_PAGE_NAME,
+} from './router-names'
 
 const routes: Array<RouteRecordRaw> = [
   {

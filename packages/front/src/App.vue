@@ -15,7 +15,8 @@ import AppNavigation from '@/components/AppNavigation.vue'
 import store from '@/store'
 import { mapGetters } from 'vuex'
 import { Api } from './api/api'
-import router, { SIGNIN_PAGE_NAME, DEFAULT_MAIN_PAGE_PATH } from './router'
+import router from './router'
+import { SIGNIN_PAGE_NAME, DEFAULT_MAIN_PAGE_PATH } from '@/router-names'
 import SplashScreen from './views/SplashScreen.vue'
 
 export default {

@@ -39,7 +39,7 @@
 <script>
 import store from '@/store'
 import { mapGetters } from 'vuex'
-import { DEFAULT_MAIN_PAGE_PATH } from '../router'
+import { DEFAULT_MAIN_PAGE_PATH } from '@/router-names'
 
 export default {
   name: 'signSin',

@@ -115,7 +115,7 @@
 import { version } from '../../package.json'
 import DayNavigation from '../views/components/DayNavigation.vue'
 import WeekNavigation from '../views/components/WeekNavigation.vue'
-import { DEFAULT_MAIN_PAGE_PATH, DEFAULT_MAIN_PAGE_NAME } from '../router.ts'
+import { DEFAULT_MAIN_PAGE_PATH, DEFAULT_MAIN_PAGE_NAME } from '@/router-names'
 
 export default {
   name: 'AppNavigation',

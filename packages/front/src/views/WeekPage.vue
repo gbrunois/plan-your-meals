@@ -30,7 +30,7 @@
 <script>
 import { daysService } from '@/services/days.service'
 import { getDateFromUrlParamsOrToday } from '@/services/router.service'
-import { WEEK_PAGE_NAME } from '../router'
+import { WEEK_PAGE_NAME } from '@/router-names'
 
 export default {
   name: WEEK_PAGE_NAME,
