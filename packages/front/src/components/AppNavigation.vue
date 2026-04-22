@@ -2,47 +2,33 @@
   <div>
     <v-navigation-drawer v-if="user" v-model="drawer" temporary app>
       <v-list class="pa-0" subheader>
-        <v-list-item v-if="user !== null" class="light">
-          <v-list-item-avatar>
-            <img :src="user.photoURL" />
-          </v-list-item-avatar>
-          <v-list-item-content>
-            <v-list-item-title>{{ user.displayName }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+        <v-list-item
+          v-if="user !== null"
+          class="light"
+          :prepend-avatar="user.photoURL"
+          :title="user.displayName"
+        ></v-list-item>
         <v-divider></v-divider>
-        <v-list-item @click="navigateToSharingsPage()">
-          <v-list-item-action>
-            <v-icon>mdi-share</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>Mes partages</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item @click="navigateToMyPlannings()">
-          <v-list-item-action>
-            <v-icon>mdi-calendar-multiple-check</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>Mes plannings</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item @click="navigateToSettings()">
-          <v-list-item-action>
-            <v-icon>mdi-settings</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>Paramètres</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item @click="logout()">
-          <v-list-item-action>
-            <v-icon>mdi-logout</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>Déconnecter</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+        <v-list-item
+          @click="navigateToSharingsPage()"
+          prepend-icon="mdi-share"
+          title="Mes partages"
+        ></v-list-item>
+        <v-list-item
+          @click="navigateToMyPlannings()"
+          prepend-icon="mdi-calendar-multiple-check"
+          title="Mes plannings"
+        ></v-list-item>
+        <v-list-item
+          @click="navigateToSettings()"
+          prepend-icon="mdi-settings"
+          title="Paramètres"
+        ></v-list-item>
+        <v-list-item
+          @click="logout()"
+          prepend-icon="mdi-logout"
+          title="Déconnecter"
+        ></v-list-item>
       </v-list>
       <v-divider></v-divider>
       <v-list class="pt-0" dense>
