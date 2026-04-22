@@ -29,7 +29,7 @@ export const DEFAULT_TIMEOUT = 10000
  * @param duration in milleseconds
  */
 export async function wait(duration: number) {
-  return new Promise((resolve) => {
+  return new Promise<void>((resolve) => {
     setTimeout(() => {
       resolve()
     }, duration)
@@ -65,7 +65,7 @@ export async function waitFor<T>(
   timeout: number,
 ) {
   if (timeout < 0) throw new Error('timeout')
-  return new Promise((resolve) => {
+  return new Promise<void>((resolve) => {
     const promise: Promise<T> = retrieveFunction.apply(null, retrieveFunctionArgs)
     promise
       .then((result: T) => {
