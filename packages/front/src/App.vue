@@ -27,20 +27,24 @@ export default {
   },
   data: () => {
     return {
-      isLoading: true,
+      isApiLoading: true,
     }
   },
   created() {
     console.info('App.created: Initializing API...')
-    this.isLoading = true
+    this.isApiLoading = true
     Api.getInstance()
       .init()
       .then(() => {
-        console.info('App.created: API initialized. Dispatching watchUserAuthenticated...')
+        console.info(
+          'App.created: API initialized. Dispatching watchUserAuthenticated...'
+        )
         store.dispatch('auth/watchUserAuthenticated')
+        this.isApiLoading = false
       })
       .catch((err) => {
         console.error('App.created: API initialization failed:', err)
+        this.isApiLoading = false
       })
   },
   computed: {
@@ -48,6 +52,9 @@ export default {
       user: 'auth/user',
       waitForAuthenticatedState: 'auth/waitForAuthenticatedState',
     }),
+    isLoading() {
+      return this.isApiLoading || this.waitForAuthenticatedState
+    },
   },
   watch: {
     user() {
@@ -58,9 +65,6 @@ export default {
         // user is connected. redirect on main page if current page is SignIn page
         router.push(DEFAULT_MAIN_PAGE_PATH)
       }
-    },
-    waitForAuthenticatedState() {
-      this.isLoading = store.state.auth.waitForAuthenticatedState
     },
   },
 }

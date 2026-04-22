@@ -41,7 +41,7 @@ export default {
       if (import.meta.env.VITE_SKIP_AUTH === 'true') {
         console.info('Mock Auth enabled. Skipping Firebase Authentication.')
         const mockUser = {
-          uid: 'mock-user-123',
+          uid: 'UbRERh5AOiejizpkyPhVND179sf1',
           displayName: 'Dev User',
           email: 'dev@example.com',
         }
