@@ -11,7 +11,7 @@ import {
   REMOVE_PENDING_SHARING,
 } from './mutations'
 import { Api } from '@/api/api'
-import { firestore } from 'firebase'
+import type firebase from 'firebase/compat/app'
 import { IActionWithoutPayload, IAction } from '../types'
 import { IState } from './types'
 import { PendingSharing, Sharing } from '@/api/sharings/sharing.type'
@@ -21,7 +21,7 @@ import { IFirestorePlanning } from '@/api/plannings/planning.type'
 // TODO use planning id in cache instead of get from FS
 async function getPrimaryPlanningRef(
   rootGetters: any
-): Promise<firestore.DocumentReference<IFirestorePlanning>> {
+): Promise<firebase.firestore.DocumentReference<IFirestorePlanning>> {
   const userPrimaryPlanningRef =
     await Api.getInstance().planningService.getPrimaryPlanningRef(
       rootGetters['auth/uid']

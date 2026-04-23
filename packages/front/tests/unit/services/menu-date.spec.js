@@ -1,4 +1,6 @@
-import { MenuDate } from '@/api/days/menu-date';
+import { MenuDate } from '@/api/days/menu-date.ts'
+import { describe, expect, it } from 'vitest'
+
 describe('MenuDate', () => {
     describe('toString', () => {
         it('should return the formatted date', () => {

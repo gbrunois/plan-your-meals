@@ -9,7 +9,7 @@ import {
   SET_PRIMARY_PLANNING,
 } from './mutations'
 import { Api } from '@/api/api'
-import { firestore } from 'firebase'
+import type firebase from 'firebase/compat/app'
 import {
   IFirestorePlanning,
   SharedPlanning,
@@ -20,7 +20,7 @@ import { IState } from './types'
 // TODO use planning id in cache instead of get from FS
 async function getPrimaryPlanningRef(
   rootGetters: any
-): Promise<firestore.DocumentReference<IFirestorePlanning>> {
+): Promise<firebase.firestore.DocumentReference<IFirestorePlanning>> {
   const userPrimaryPlanningRef =
     await Api.getInstance().planningService.getPrimaryPlanningRef(
       rootGetters['auth/uid']

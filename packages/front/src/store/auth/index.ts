@@ -1,4 +1,5 @@
 import authService from '@/api/auth/auth.service'
+import type firebase from 'firebase/compat/app'
 import { IState } from './types'
 
 const inLocalStorageUid = localStorage.getItem('authUser')
@@ -38,18 +39,6 @@ export default {
       )
     },
     watchUserAuthenticated({ commit, dispatch }: any) {
-      if (import.meta.env.VITE_SKIP_AUTH === 'true') {
-        console.info(
-          'Mock Auth enabled. Committing mock user'
-        )
-        const mockUser = {
-          uid: 'test-user-id',
-          displayName: 'Dev User',
-          email: 'dev@example.com',
-        }
-        commit('setUser', mockUser)
-      }
-
       commit('setWaitForAuthenticatedState', true)
       authService
         .getRedirectResult()
@@ -63,9 +52,6 @@ export default {
         })
         .finally(() => {
           authService.onAuthStateChanged((user: firebase.User | null) => {
-            if (import.meta.env.VITE_SKIP_AUTH !== 'true') {
-              commit('setUser', user)
-            }
             commit('setWaitForAuthenticatedState', false)
           })
         })

@@ -1,4 +1,4 @@
-import firebase from 'firebase/compat/app'
+import type firebase from 'firebase/compat/app'
 import { database } from '../firebaseService'
 import {
   Sharing,
@@ -32,7 +32,7 @@ async function requestApi<T>(method: HttpMethod, endPoint: string, data?: any) {
   let idToken
   try {
     idToken = await user.getIdToken()
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error caught getIdToken', error.message)
     throw error
   }
@@ -79,7 +79,7 @@ export class SharingService {
         const result: Sharing[] = []
         querySnapshot.forEach((doc) => {
           const data = doc.data()
-          result.push(SharingBuilder.build(doc.id, data))
+          result.push(SharingBuilder.build(doc.id, data as IFirestoreSharing))
         })
         return result
       })
@@ -97,7 +97,7 @@ export class SharingService {
         const result: PendingSharing[] = []
         querySnapshot.forEach((doc) => {
           const data = doc.data()
-          result.push(PendingSharingBuilder.build(doc.id, data))
+          result.push(PendingSharingBuilder.build(doc.id, data as IFirestorePendingSharing))
         })
         return result
       })

@@ -20,12 +20,10 @@ import {
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/index.html',
-    component: WeekPage,
     redirect: DEFAULT_MAIN_PAGE_PATH,
   },
   {
     path: '/',
-    component: WeekPage,
     redirect: DEFAULT_MAIN_PAGE_PATH,
   },
   {

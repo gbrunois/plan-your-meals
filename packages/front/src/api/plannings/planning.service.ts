@@ -107,7 +107,7 @@ export class PlanningService {
         const result: SharedPlanning[] = []
         querySnapshot.forEach((doc) => {
           const data = doc.data()
-          result.push(SharedPlanningBuilder.build(doc.id, data))
+          result.push(SharedPlanningBuilder.build(doc.id, data as IFirestoreUserSharing))
         })
         return result
       })

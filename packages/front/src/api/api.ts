@@ -1,11 +1,11 @@
-import 'firebase/auth'
-import 'firebase/firestore'
+import 'firebase/compat/auth'
+import 'firebase/compat/firestore'
 import { DayService } from './days/day.service'
 import { database } from './firebaseService'
 import { PlanningService } from './plannings/planning.service'
 import { UserService } from './auth/user.service'
 import { SharingService } from './sharings/sharing.service'
-import { firestore } from 'firebase'
+import type firebase from 'firebase/compat/app'
 
 export class Api {
   public static getInstance() {
@@ -67,14 +67,14 @@ export class Api {
   }
 }
 
-export function genericConverter<T>(): firestore.FirestoreDataConverter<T> {
+export function genericConverter<T>(): firebase.firestore.FirestoreDataConverter<T> {
   return {
-    toFirestore(t: T): firestore.DocumentData {
-      return t as firestore.DocumentData
+    toFirestore(t: T): firebase.firestore.DocumentData {
+      return t as firebase.firestore.DocumentData
     },
     fromFirestore(
-      snapshot: firestore.QueryDocumentSnapshot,
-      options: firestore.SnapshotOptions
+      snapshot: firebase.firestore.QueryDocumentSnapshot,
+      options: firebase.firestore.SnapshotOptions
     ): T {
       const data = snapshot.data(options)!
       return data as T

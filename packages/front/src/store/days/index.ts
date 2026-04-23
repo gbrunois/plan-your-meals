@@ -1,4 +1,5 @@
 import { Api } from '@/api/api'
+import type firebase from 'firebase/compat/app'
 import { DayMenu } from '@/api/days/day-menu'
 import { MealPeriod } from '@/api/days/meal-period.type'
 import { MenuDate } from '@/api/days/menu-date'
