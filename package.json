@@ -10,7 +10,8 @@
     "front": "npm run dev -w @plan-your-meals/front",
     "build": "npm run build --workspaces",
     "lint": "npm run lint --workspaces",
-    "test": "npm run test --workspaces"
+    "test": "npm run test --workspaces",
+    "bootstrap": "npm install --workspaces"
   },
   "repository": {
     "type": "git",
