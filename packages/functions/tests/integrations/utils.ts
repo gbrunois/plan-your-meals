@@ -6,7 +6,6 @@ import { authServices } from '../../src/services/auth-service'
 import { firestoreServices } from '../../src/services/firestore-service'
 
 import * as firebase from 'firebase/app'
-import 'firebase/auth'
 import { IPlanning } from '../../src/types/types'
 
 export interface User {

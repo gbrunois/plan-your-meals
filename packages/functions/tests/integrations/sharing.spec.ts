@@ -20,7 +20,7 @@ describe('sharing', () => {
   })
 
   afterAll(async () => {
-    app.delete()
+    await app.delete()
   })
 
   afterEach(async () => {

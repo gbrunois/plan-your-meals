@@ -2,7 +2,7 @@
   "name": "@plan-your-meals/functions",
   "description": "whats for dinner firebase functions",
   "engines": {
-    "node": "14"
+    "node": "20"
   },
   "scripts": {
     "lint": "tslint --project tsconfig.json",
