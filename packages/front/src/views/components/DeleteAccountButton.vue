@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="dialog" persistent>
-    <template v-slot:activator="{ on }">
+    <template #activator="{ on }">
       <v-btn color="error" outlined v-on="on">
         <v-icon left dark>mdi-delete-forever</v-icon>Supprimer mon compte
       </v-btn>

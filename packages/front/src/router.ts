@@ -1,6 +1,6 @@
 import store from '@/store'
 import { createRouter, createWebHistory } from 'vue-router'
-import type { RouteRecordRaw, RouteLocationNormalized } from 'vue-router'
+import type { RouteRecordRaw } from 'vue-router'
 import DayPage from './views/DayPage.vue'
 import MyPlanningsPage from './views/MyPlannings.vue'
 import PrivacyPolicyPage from './views/PrivacyPolicy.vue'

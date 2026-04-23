@@ -8,7 +8,7 @@
 <script>
 import axios from 'axios'
 export default {
-  name: 'terms-of-service',
+  name: 'TermsOfService',
   data: () => {
     return {
       content: '<p></p>',

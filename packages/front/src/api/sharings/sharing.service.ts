@@ -1,5 +1,4 @@
 import type firebase from 'firebase/compat/app'
-import { database } from '../firebaseService'
 import {
   Sharing,
   SharingBuilder,
@@ -97,7 +96,12 @@ export class SharingService {
         const result: PendingSharing[] = []
         querySnapshot.forEach((doc) => {
           const data = doc.data()
-          result.push(PendingSharingBuilder.build(doc.id, data as IFirestorePendingSharing))
+          result.push(
+            PendingSharingBuilder.build(
+              doc.id,
+              data as IFirestorePendingSharing
+            )
+          )
         })
         return result
       })

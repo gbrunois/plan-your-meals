@@ -21,7 +21,7 @@
       </div>
     </v-col>
     <v-col cols="12" class="text-center">
-      <v-btn @click="authenticate" color="secondary">
+      <v-btn color="secondary" @click="authenticate">
         <v-icon left dark>mdi-google</v-icon>Me connecter avec Google
       </v-btn>
     </v-col>
@@ -42,7 +42,7 @@ import { mapGetters } from 'vuex'
 import { DEFAULT_MAIN_PAGE_PATH } from '@/router-names'
 
 export default {
-  name: 'signSin',
+  name: 'SignSin',
   data() {
     return {
       publicPath: process.env.BASE_URL,

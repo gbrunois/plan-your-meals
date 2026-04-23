@@ -3,7 +3,11 @@
     <app-navigation />
     <v-main>
       <splash-screen :is-loading="isLoading" />
-      <v-container fluid class="bg-grey-lighten-4 fill-height" v-if="!isLoading">
+      <v-container
+        v-if="!isLoading"
+        fluid
+        class="bg-grey-lighten-4 fill-height"
+      >
         <router-view></router-view>
       </v-container>
     </v-main>

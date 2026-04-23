@@ -10,7 +10,7 @@
 import DeleteAccountButton from './components/DeleteAccountButton'
 
 export default {
-  name: 'settings',
+  name: 'Settings',
   components: {
     deleteAccountButton: DeleteAccountButton,
   },

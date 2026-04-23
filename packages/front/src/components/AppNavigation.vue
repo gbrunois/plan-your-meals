@@ -10,24 +10,24 @@
         ></v-list-item>
         <v-divider></v-divider>
         <v-list-item
-          @click="navigateToSharingsPage()"
           prepend-icon="mdi-share"
           title="Mes partages"
+          @click="navigateToSharingsPage()"
         ></v-list-item>
         <v-list-item
-          @click="navigateToMyPlannings()"
           prepend-icon="mdi-calendar-multiple-check"
           title="Mes plannings"
+          @click="navigateToMyPlannings()"
         ></v-list-item>
         <v-list-item
-          @click="navigateToSettings()"
           prepend-icon="mdi-settings"
           title="Paramètres"
+          @click="navigateToSettings()"
         ></v-list-item>
         <v-list-item
-          @click="logout()"
           prepend-icon="mdi-logout"
           title="Déconnecter"
+          @click="logout()"
         ></v-list-item>
       </v-list>
       <v-divider></v-divider>
@@ -56,24 +56,26 @@
         >Enregistrer</v-btn
       >
       <v-app-bar-nav-icon
-        @click.stop="onTodayButtonClick"
         v-if="showToolbarExtension"
+        @click.stop="onTodayButtonClick"
       >
         <v-icon>mdi-calendar</v-icon>
       </v-app-bar-nav-icon>
-      <v-row slot="extension" v-if="showToolbarExtension" no-gutters>
-        <v-col cols="12">
-          <component v-bind:is="currentTabComponent"></component>
-        </v-col>
-        <v-col class="flex-progress-linear" cols="12">
-          <v-progress-linear
-            class="mx-0 my-1"
-            :indeterminate="true"
-            v-if="isLoading"
-            color="white"
-          ></v-progress-linear>
-        </v-col>
-      </v-row>
+      <template #extension>
+        <v-row v-if="showToolbarExtension" no-gutters>
+          <v-col cols="12">
+            <component :is="currentTabComponent"></component>
+          </v-col>
+          <v-col class="flex-progress-linear" cols="12">
+            <v-progress-linear
+              v-if="isLoading"
+              class="mx-0 my-1"
+              :indeterminate="true"
+              color="white"
+            ></v-progress-linear>
+          </v-col>
+        </v-row>
+      </template>
     </v-app-bar>
     <v-dialog v-model="dialogHasPendingRequests" persistent>
       <v-card>

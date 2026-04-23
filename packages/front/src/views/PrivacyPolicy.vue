@@ -9,7 +9,7 @@
 <script>
 import axios from 'axios'
 export default {
-  name: 'privacy-policy',
+  name: 'PrivacyPolicy',
   data: () => {
     return {
       content: '<p></p>',

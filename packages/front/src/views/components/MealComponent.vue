@@ -1,20 +1,26 @@
 <template>
   <v-textarea
-    @update:model-value="onUpdate($event)"
     v-model="day[meal]"
     variant="filled"
     :label="label"
     no-resize
     :disabled="disabled"
+    @update:model-value="onUpdate($event)"
   ></v-textarea>
 </template>
 
 <script>
 export default {
-  name: 'meal',
+  name: 'Meal',
+  props: ['label', 'day', 'meal', 'disabled'],
   data() {
     return {
       timer: null,
+    }
+  },
+  unmounted() {
+    if (this.timer) {
+      clearTimeout(this.timer)
     }
   },
   methods: {
@@ -35,11 +41,5 @@ export default {
       })
     },
   },
-  unmounted() {
-    if (this.timer) {
-      clearTimeout(this.timer)
-    }
-  },
-  props: ['label', 'day', 'meal', 'disabled'],
 }
 </script>

@@ -10,7 +10,7 @@
                 <v-list-item-subtitle>
                   {{ planning.isOwner ? 'Propriétaire' : 'Partagé' }}
                 </v-list-item-subtitle>
-                <template v-slot:append>
+                <template #append>
                   <v-icon
                     v-if="planning.primary === false"
                     color="grey-lighten-1"
@@ -29,7 +29,7 @@
 
 <script>
 export default {
-  name: 'my-plannings',
+  name: 'MyPlannings',
   computed: {
     myPlannings() {
       return this.$store.getters['plannings/myPlannings']

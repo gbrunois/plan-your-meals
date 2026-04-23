@@ -67,7 +67,9 @@ export class Api {
   }
 }
 
-export function genericConverter<T>(): firebase.firestore.FirestoreDataConverter<T> {
+export function genericConverter<
+  T,
+>(): firebase.firestore.FirestoreDataConverter<T> {
   return {
     toFirestore(t: T): firebase.firestore.DocumentData {
       return t as firebase.firestore.DocumentData

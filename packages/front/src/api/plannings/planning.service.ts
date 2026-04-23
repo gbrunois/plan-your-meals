@@ -1,13 +1,7 @@
 import firebase from 'firebase/compat/app'
 import { database } from '../firebaseService'
-import {
-  SharedPlanning,
-  SharedPlanningBuilder,
-} from './planning.type'
-import type {
-  IFirestorePlanning,
-  IFirestoreUserSharing,
-} from './planning.type'
+import { SharedPlanning, SharedPlanningBuilder } from './planning.type'
+import type { IFirestorePlanning, IFirestoreUserSharing } from './planning.type'
 import { genericConverter } from '../api'
 
 const sharingConverter = genericConverter<IFirestoreUserSharing>()
@@ -107,7 +101,9 @@ export class PlanningService {
         const result: SharedPlanning[] = []
         querySnapshot.forEach((doc) => {
           const data = doc.data()
-          result.push(SharedPlanningBuilder.build(doc.id, data as IFirestoreUserSharing))
+          result.push(
+            SharedPlanningBuilder.build(doc.id, data as IFirestoreUserSharing)
+          )
         })
         return result
       })

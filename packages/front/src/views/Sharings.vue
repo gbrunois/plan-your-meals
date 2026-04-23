@@ -4,8 +4,8 @@
       <v-row no-gutters style="background: #fff">
         <v-col cols="12" class="px-2">
           <v-text-field
-            v-model="email"
             ref="inputEmail"
+            v-model="email"
             label="Saisissez une adresse e-mail"
             type="text"
             append-inner-icon="mdi-account-plus"
@@ -25,11 +25,17 @@
           <v-list lines="two">
             <template v-for="sharing in sharings" :key="sharing.userEmail">
               <v-list-item>
-                <v-list-item-title>{{ sharing.userDisplayName }}</v-list-item-title>
-                <v-list-item-subtitle>{{ sharing.userEmail }}</v-list-item-subtitle>
+                <v-list-item-title>{{
+                  sharing.userDisplayName
+                }}</v-list-item-title>
+                <v-list-item-subtitle>{{
+                  sharing.userEmail
+                }}</v-list-item-subtitle>
 
-                <template v-slot:append>
-                  <span v-if="sharing.isOwner" class="font-weight-light text-caption"
+                <template #append>
+                  <span
+                    v-if="sharing.isOwner"
+                    class="font-weight-light text-caption"
                     >Propriétaire</span
                   >
                   <v-icon v-else @click="removeSharing(sharing)"
@@ -40,14 +46,17 @@
             </template>
           </v-list>
           <v-list lines="two">
-            <template v-for="sharing in pendingSharings" :key="sharing.userEmail">
+            <template
+              v-for="sharing in pendingSharings"
+              :key="sharing.userEmail"
+            >
               <v-list-item>
                 <v-list-item-title class="font-weight-light font-italic">
                   {{ sharing.userEmail }}
                 </v-list-item-title>
                 <v-list-item-subtitle>(En attente)</v-list-item-subtitle>
 
-                <template v-slot:append>
+                <template #append>
                   <v-icon @click="removePendingSharing(sharing)"
                     >mdi-close-circle-outline</v-icon
                   >
@@ -64,11 +73,7 @@
 import { Utils } from '../services/utils'
 
 export default {
-  name: 'sharings',
-
-  created() {
-    this.$store.dispatch('sharings/fetchSharings')
-  },
+  name: 'Sharings',
   data: () => {
     return {
       email: '',
@@ -84,6 +89,10 @@ export default {
     pendingSharings() {
       return this.$store.getters['sharings/pendingSharings']
     },
+  },
+
+  created() {
+    this.$store.dispatch('sharings/fetchSharings')
   },
   methods: {
     addSharing(event) {

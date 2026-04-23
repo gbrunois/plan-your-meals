@@ -25,7 +25,7 @@ describe('user', () => {
   })
 
   afterAll(async () => {
-    app.delete()
+    await app.delete()
   })
 
   it('should create a planning and user when a user is created', async () => {

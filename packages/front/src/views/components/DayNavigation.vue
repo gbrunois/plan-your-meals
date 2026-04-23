@@ -10,7 +10,7 @@
     >
       <v-icon>mdi-chevron-left</v-icon>
     </v-btn>
-    <div class="my-auto" v-if="openedDay">
+    <div v-if="openedDay" class="my-auto">
       {{ openedDay.date.toLongFormat() }}
     </div>
     <v-btn
