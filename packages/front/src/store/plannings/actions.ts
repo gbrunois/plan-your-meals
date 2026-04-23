@@ -54,7 +54,7 @@ const fetchMyPlannings: IActionWithoutPayload<IState> = async ({
 }
 
 const setAsPrimary: IAction<IState, SharedPlanning> = (
-  { state, commit },
+  { commit },
   planning
 ) => {
   commit(SET_PRIMARY_PLANNING, planning.planningId)

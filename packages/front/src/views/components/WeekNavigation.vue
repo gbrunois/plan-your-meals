@@ -27,7 +27,7 @@
 <script>
 import { daysService } from '@/services/days.service'
 import { mapGetters } from 'vuex'
-import { DEFAULT_MAIN_PAGE_PATH, WEEK_PAGE_NAME } from '@/router-names'
+import { WEEK_PAGE_NAME } from '@/router-names'
 
 export default {
   computed: {

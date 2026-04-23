@@ -1,4 +1,4 @@
-import { IMutationWithoutPayload, IMutation, IAction } from '../types'
+import { IMutationWithoutPayload, IMutation } from '../types'
 import { IState, IFetchSharingsResult as IFetchedSharingsResult } from './types'
 import { PendingSharing, Sharing } from '@/api/sharings/sharing.type'
 

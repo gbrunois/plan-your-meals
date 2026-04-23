@@ -95,7 +95,7 @@ export default {
     this.$store.dispatch('sharings/fetchSharings')
   },
   methods: {
-    addSharing(event) {
+    addSharing() {
       if (Utils.emailIsValid(this.email)) {
         this.$store.dispatch('sharings/addNewSharing', this.email)
 

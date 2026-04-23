@@ -1,6 +1,6 @@
 <template>
   <v-textarea
-    v-model="day[meal]"
+    :model-value="day[meal]"
     variant="filled"
     :label="label"
     no-resize

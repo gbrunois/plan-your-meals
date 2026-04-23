@@ -76,7 +76,7 @@ const actions = {
     commit('fetchDays', { beginDate, endDate })
     return new Promise<DayMenu[]>((resolve, reject) => {
       try {
-        const unsubscribe =
+        const _unsubscribe =
           Api.getInstance().planningService.watchPrimaryPlanningRef(
             rootGetters['auth/uid'],
             async (

@@ -14,9 +14,8 @@ import { Api } from '@/api/api'
 import type firebase from 'firebase/compat/app'
 import { IActionWithoutPayload, IAction } from '../types'
 import { IState } from './types'
-import { PendingSharing, Sharing } from '@/api/sharings/sharing.type'
-import sharings from '.'
-import { IFirestorePlanning } from '@/api/plannings/planning.type'
+import { Sharing } from '@/api/sharings/sharing.type'
+import type { IFirestorePlanning } from '@/api/plannings/planning.type'
 
 // TODO use planning id in cache instead of get from FS
 async function getPrimaryPlanningRef(
@@ -69,7 +68,6 @@ const synchronizePendingRequests: IActionWithoutPayload<IState> = async ({
   state,
   commit,
   rootGetters,
-  dispatch,
 }) => {
   const newSharings = [...state.pendingState.newSharings]
   const sharingsToRemove = [...state.pendingState.sharingsToRemove]

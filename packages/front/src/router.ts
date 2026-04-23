@@ -1,6 +1,6 @@
 import store from '@/store'
 import { createRouter, createWebHistory } from 'vue-router'
-import type { RouteRecordRaw } from 'vue-router'
+import type { RouteRecordRaw, RouteLocationNormalized } from 'vue-router'
 import DayPage from './views/DayPage.vue'
 import MyPlanningsPage from './views/MyPlannings.vue'
 import PrivacyPolicyPage from './views/PrivacyPolicy.vue'
@@ -136,7 +136,7 @@ router.beforeEach(async (to, from, next) => {
   }
 })
 
-router.afterEach(async (to, from) => {
+router.afterEach(async (to, _from) => {
   if (isAWeekPage(to)) {
     store.commit('setCurrentWeekPage', to.path)
   }
@@ -146,7 +146,7 @@ router.afterEach(async (to, from) => {
  * Return true if the route is a week page
  * @param route Route
  */
-function isAWeekPage(route: any) {
+function isAWeekPage(route: RouteLocationNormalized) {
   return route.name === WEEK_PAGE_NAME || route.name === DEFAULT_MAIN_PAGE_NAME
 }
 

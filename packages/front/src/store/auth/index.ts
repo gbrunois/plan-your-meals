@@ -38,7 +38,7 @@ export default {
         })
       )
     },
-    watchUserAuthenticated({ commit, dispatch }: any) {
+    watchUserAuthenticated({ commit }: any) {
       commit('setWaitForAuthenticatedState', true)
       authService
         .getRedirectResult()
@@ -51,7 +51,7 @@ export default {
           console.error('Redirect sign-in error:', error)
         })
         .finally(() => {
-          authService.onAuthStateChanged((user: firebase.User | null) => {
+          authService.onAuthStateChanged((_user: firebase.User | null) => {
             commit('setWaitForAuthenticatedState', false)
           })
         })
