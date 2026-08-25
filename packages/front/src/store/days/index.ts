@@ -135,6 +135,11 @@ const actions = {
   },
   update({ state, commit }: any, arg: any) {
     if (state.openedDay) {
+      // Apply the local mutation first so `x` below reflects the value that
+      // was just typed. Building `x` before this commit would snapshot the
+      // *previous* value of the field being edited, sending stale data to
+      // Firestore (one edit behind) every time.
+      commit('update', arg)
       commit('saving')
       const x = {
         date: state.openedDay.date,
@@ -149,7 +154,6 @@ const actions = {
         .catch(() => {
           commit('savedFailed')
         })
-      commit('update', arg)
     }
   },
   async openDay(

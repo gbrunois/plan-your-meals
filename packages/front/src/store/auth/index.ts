@@ -28,8 +28,19 @@ export default {
     },
   },
   actions: {
-    async signIn() {
-      return authService.signInWithGoogleWithRedirect()
+    // Note: user profile / planning initialization is NOT done here.
+    // It's handled directly against Firestore (client SDK) in
+    // store/days -> Api.planningService.initializeUser(), the first time
+    // a user without a primary_planning is detected. The backend Cloud
+    // Functions equivalent (initializeUser) currently can't be reached
+    // (public HTTPS invocation is blocked by a GCP IAM/org policy on the
+    // 2nd Gen Cloud Run services), so we don't depend on it client-side.
+    async signIn({ commit }: any) {
+      return authService.signInWithGoogleWithPopup().then((result: any) => {
+        if (result && result.user) {
+          commit('setUser', result.user)
+        }
+      })
     },
     deleteAccount({ commit, dispatch }: any) {
       return dispatch('days/unsubscribe', undefined, { root: true }).then(() =>
@@ -40,21 +51,11 @@ export default {
     },
     watchUserAuthenticated({ commit }: any) {
       commit('setWaitForAuthenticatedState', true)
-      authService
-        .getRedirectResult()
-        .then((result) => {
-          if (result.user) {
-            commit('setUser', result.user)
-          }
-        })
-        .catch((error) => {
-          console.error('Redirect sign-in error:', error)
-        })
-        .finally(() => {
-          authService.onAuthStateChanged((_user: firebase.User | null) => {
-            commit('setWaitForAuthenticatedState', false)
-          })
-        })
+      authService.onAuthStateChanged((_user: firebase.User | null) => {
+        console.info('Auth state changed:', { uid: _user?.uid || 'none' })
+        commit('setUser', _user)
+        commit('setWaitForAuthenticatedState', false)
+      })
     },
     logout({ commit, dispatch }: any) {
       return dispatch('days/unsubscribe', undefined, { root: true }).then(() =>

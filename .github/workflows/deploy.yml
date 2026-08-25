@@ -43,10 +43,12 @@ jobs:
         if: github.ref == 'refs/heads/develop' || github.event_name == 'workflow_dispatch'
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_DEV_TOKEN }}
-        run: npx firebase-tools deploy -f --project "whats-for-dinner-id" --token "$FIREBASE_TOKEN"
+        # Project IDs are kept out of the repo (public GitHub); set them as
+        # repo/environment secrets instead of hardcoding them here.
+        run: npx firebase-tools deploy -f --project "${{ secrets.FIREBASE_DEV_PROJECT_ID }}" --token "$FIREBASE_TOKEN"
 
       - name: Deploy to Firebase (Prod)
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_PROD_TOKEN }}
-        run: npx firebase-tools deploy -f --project "plan-your-meals" --token "$FIREBASE_TOKEN"
+        run: npx firebase-tools deploy -f --project "${{ secrets.FIREBASE_PROD_PROJECT_ID }}" --token "$FIREBASE_TOKEN"

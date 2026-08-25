@@ -27,5 +27,10 @@ packages/front/dist
 packages/front/firebase-debug.log
 packages/functions/conversation.txt
 packages/functions/firebase-debug.log
+packages/functions/firestore-debug.log
 .env*
+!.env.example
 secrets
+
+# Contains real Firebase project IDs — never commit, see .firebaserc.example
+.firebaserc

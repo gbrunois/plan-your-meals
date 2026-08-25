@@ -40,14 +40,12 @@ export class Api {
     if (this.isInitialized) {
       return Promise.resolve()
     }
-    return database
-      .enablePersistence({ synchronizeTabs: true })
-      .catch((err: any) => {
-        console.error(err)
-      })
-      .then(() => {
-        this.isInitialized = true
-      })
+    // Offline persistence (IndexedDB) was disabled: it stores DocumentReference
+    // fields (e.g. IUser.primary_planning) which cannot be structured-cloned into
+    // IndexedDB, causing "DataCloneError" and Firestore's
+    // "INTERNAL ASSERTION FAILED: Unexpected state" crashes.
+    this.isInitialized = true
+    return Promise.resolve()
   }
 
   get planningService() {

@@ -9,9 +9,12 @@
   "scripts": {
     "front": "npm run dev -w @plan-your-meals/front",
     "build": "npm run build --workspaces",
+    "build:prod": "npm run build -w @plan-your-meals/front -- --mode production",
     "lint": "npm run lint --workspaces",
     "test": "npm run test --workspaces",
-    "bootstrap": "npm install --workspaces"
+    "bootstrap": "npm install --workspaces",
+    "deploy:dev": "firebase deploy --project dev",
+    "deploy:prod": "npm run build:prod && firebase deploy --project prod"
   },
   "repository": {
     "type": "git",

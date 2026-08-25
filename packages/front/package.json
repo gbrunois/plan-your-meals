@@ -10,9 +10,9 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --max-warnings=50",
     "test": "vitest run",
     "prettier": "prettier --write ./src/**/*.ts ./src/**/*.vue",
-    "deploy:rules": "firebase deploy --only firestore:rules",
-    "predeploy:web": "npm run build",
-    "deploy:web": "firebase deploy --only hosting"
+    "deploy:rules": "firebase deploy --only firestore:rules --project dev",
+    "predeploy:web": "npm run build -- --mode development",
+    "deploy:web": "firebase deploy --only hosting --project dev"
   },
   "dependencies": {
     "@mdi/font": "^4.9.95",

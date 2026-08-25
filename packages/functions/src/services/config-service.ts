@@ -1,4 +1,7 @@
-import * as functions from 'firebase-functions'
+import * as dotenv from 'dotenv'
+
+// Load environment variables from .env file
+dotenv.config()
 
 interface IGmailConfig {
   user: string
@@ -12,19 +15,20 @@ interface IAppConfig {
 }
 
 class Config {
-  private _config: functions.config.Config
-
-  constructor(c: functions.config.Config) {
-    this._config = c
-  }
-
   get gmailConfig(): IGmailConfig {
-    return this._config.gmailconfig
+    return {
+      user: process.env.GMAIL_USER || '',
+      password: process.env.GMAIL_PASSWORD || '',
+    }
   }
 
   get app(): IAppConfig {
-    return this._config.app
+    return {
+      name: process.env.APP_NAME || 'Plan Your Meals',
+      url: process.env.APP_URL || 'http://localhost:3000',
+      corsOrigin: (process.env.CORS_ORIGIN || '*').split(',').map(o => o.trim()),
+    }
   }
 }
 
-export const config = new Config(functions.config())
+export const config = new Config()

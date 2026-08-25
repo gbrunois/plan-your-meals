@@ -1,39 +1,105 @@
 import {
   DocumentReference,
-  DocumentData,
   Transaction,
   DocumentSnapshot,
   WriteResult,
-  FirestoreDataConverter,
 } from '@google-cloud/firestore'
 import admin = require('firebase-admin')
 import {
   IPlanning,
   IUser,
+  IDbUser,
+  IDbPlanning,
   IPlanningSharing,
   IPendingInvitation,
   IUserSharing,
   IPlanningPendingSharing,
+  IDbPlanningSharing,
+  IDbPlanningPendingSharing,
+  IDbUserSharing,
+  IDbPendingInvitation,
 } from '../types/types'
 import * as _ from 'lodash'
 import { removeDotsInEmail } from './string-utils'
+import { FirestoreDataConverter, QueryDocumentSnapshot, DocumentData, WithFieldValue } from 'firebase-admin/firestore'
 
-function genericConverter<T>(): FirestoreDataConverter<T> {
-  return {
-    toFirestore(t: T): FirebaseFirestore.DocumentData {
-      return t as DocumentData
+
+const planningSharingConverter = {
+    toFirestore(value: IPlanningSharing): IDbPlanningSharing {
+      return value as IDbPlanningSharing
     },
-    fromFirestore(data: FirebaseFirestore.DocumentData): T {
-      return data as T
-    },
-  }
+    fromFirestore(snapshot: QueryDocumentSnapshot): IPlanningSharing {
+      const data = snapshot.data() as IDbPlanningSharing
+      return {
+        ...data,
+        id: snapshot.id,
+      } as IPlanningSharing
+    }
 }
-const userConverter = genericConverter<IUser>()
-const planningSharingConverter = genericConverter<IPlanningSharing>()
-const planningPendingSharingConverter = genericConverter<IPlanningPendingSharing>()
-const userSharingConverter = genericConverter<IUserSharing>()
-const planningConverter = genericConverter<IPlanning>()
-const pendingInvitationConverter = genericConverter<IPendingInvitation>()
+const userSharingConverter = {
+    toFirestore(value: IUserSharing): IDbUserSharing {
+      return value as IDbUserSharing
+    },
+    fromFirestore(snapshot: QueryDocumentSnapshot): IUserSharing {
+      const data = snapshot.data() as IDbUserSharing
+      return {
+        ...data,
+        id: snapshot.id,
+      } as IUserSharing
+    }
+}
+
+const userConverter = {
+  toFirestore(value: IUser): IDbUser {
+    return value as IDbUser
+  },
+  fromFirestore(snapshot: QueryDocumentSnapshot): IUser {
+    const data = snapshot.data() as IDbUser
+    return {
+      ...data,
+      id: snapshot.id,
+    } as IUser
+  }
+} 
+
+const planningConverter = {
+    toFirestore(value: IPlanning): IDbPlanning {
+      return value as IDbPlanning
+    },
+    fromFirestore(snapshot: QueryDocumentSnapshot): IPlanning {
+      const data = snapshot.data() as IDbPlanning
+      return {
+        ...data,
+        id: snapshot.id,
+      } as IPlanning
+    }
+}
+
+const planningPendingSharingConverter = {
+    toFirestore(value: IPlanningPendingSharing): IDbPlanningPendingSharing {
+      return value as IDbPlanningPendingSharing
+    },
+    fromFirestore(snapshot: QueryDocumentSnapshot): IPlanningPendingSharing {
+      const data = snapshot.data() as IDbPlanningPendingSharing
+      return {
+        ...data,
+        id: snapshot.id,
+      } as IPlanningPendingSharing
+    }
+}
+
+const pendingInvitationConverter = {
+    toFirestore(value: IPendingInvitation): IDbPendingInvitation {
+      return value as IDbPendingInvitation
+    },
+    fromFirestore(snapshot: QueryDocumentSnapshot): IPendingInvitation {
+      const data = snapshot.data() as IDbPendingInvitation
+      return {
+        ...data,
+        id: snapshot.id,
+      } as IPendingInvitation
+    }
+}
 
 export const firestoreServices = {
   createUser(userId: string, newPlanningRef: DocumentReference<IPlanning>, t: Transaction = null) {
@@ -409,9 +475,7 @@ export const firestoreServices = {
   async setPrimaryPlanning(userId: string, planningRef: DocumentReference<IPlanning>) {
     console.log('setPrimaryPlanning', { userId, planningRef: planningRef.path })
     const user = await firestoreServices.getUser(userId)
-    const userData = user.data()
-    userData.primary_planning = planningRef
-    return user.ref.update(userData)
+    return user.ref.update({ primary_planning: planningRef })
   },
 
   async deletePendingInvitation(ref: DocumentReference<IPendingInvitation>) {
@@ -525,8 +589,7 @@ async function resetUserPrimaryPlanningWithOwnPlanning(
   if (user) {
     const userData = user.data()
     if (userData.primary_planning.id === oldPlanningRef.id) {
-      userData.primary_planning = userData.own_planning
-      await user.ref.update(userData)
+      await user.ref.update({ primary_planning: userData.own_planning })
     }
   }
 }

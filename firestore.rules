@@ -1,31 +1,40 @@
 service cloud.firestore {
   match /databases/{database}/documents {
-  
+
   	function existsSharing(userId, planningId) {
         return exists(/databases/$(database)/documents/plannings/$(planningId)/sharings/$(userId))
     }
-    
+
     match /users/{userId} {
-      allow get, update: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow get, update, delete: if request.auth != null && request.auth.uid == userId;
 
       match /sharings/{sharing} {
-        allow get, list: if request.auth != null && request.auth.uid == userId;
+        allow create, get, list, update, delete: if request.auth != null && request.auth.uid == userId;
       }
     }
 
     match /plannings/{planningId} {
-      allow list: if request.auth != null && request.auth.uid != null;
-      allow get: if request.auth != null && request.auth.uid != null;
-      
+      allow create: if request.auth != null;
+      allow get, list, update, delete: if request.auth != null && existsSharing(request.auth.uid, planningId);
+
       match /days/{day} {
-        allow get, list, create, update: if existsSharing(request.auth.uid, planningId);
+        allow get, list, create, update, delete: if request.auth != null && existsSharing(request.auth.uid, planningId);
       }
       match /sharings/{sharing} {
-        allow get, list: if existsSharing(request.auth.uid, planningId);
+        allow get, list, update, delete: if request.auth != null && existsSharing(request.auth.uid, planningId);
+        // A user can only ever create a sharing entry naming themselves (doc id == their uid).
+        // This avoids a get() on the sibling planning doc, which would not see writes from
+        // the same atomic batch (e.g. the initial planning-creation batch) and always fail.
+        allow create: if request.auth != null && request.auth.uid == sharing;
       }
       match /pending_sharings/{sharing} {
-        allow get, list: if existsSharing(request.auth.uid, planningId);
+        allow create, get, list, update, delete: if request.auth != null && existsSharing(request.auth.uid, planningId);
       }
+    }
+
+    match /pending_invitations/{invitation} {
+      allow create, get, list, update, delete: if request.auth != null && request.auth.uid != null;
     }
   }
 }

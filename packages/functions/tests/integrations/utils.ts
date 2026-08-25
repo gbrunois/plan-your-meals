@@ -7,6 +7,7 @@ import { firestoreServices } from '../../src/services/firestore-service'
 
 import * as firebase from 'firebase/app'
 import { IPlanning } from '../../src/types/types'
+import { getAuth, signInWithCustomToken } from 'firebase/auth'
 
 export interface User {
   email: string
@@ -90,15 +91,15 @@ export async function waitFor<T>(
 export function initFirebaseApp() {
   const app = admin.initializeApp({
     credential: admin.credential.cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY,
+      projectId: process.env.SA_PROJECT_ID,
+      clientEmail: process.env.SA_CLIENT_EMAIL,
+      privateKey: process.env.SA_PRIVATE_KEY,
     }),
-    databaseURL: process.env.FIREBASE_DATABASE_URL,
+    databaseURL: process.env.SA_DATABASE_URL,
   })
   firebase.initializeApp({
-    apiKey: process.env.FIREBASE_API_KEY,
-    databaseURL: process.env.FIREBASE_DATABASE_URL,
+    apiKey: process.env.SA_API_KEY,
+    databaseURL: process.env.SA_DATABASE_URL,
   })
   return app
 }
@@ -117,7 +118,7 @@ export async function deleteUsers(app: admin.app.App, ...userEmails: string[]) {
 
 async function getIdToken(userId) {
   const customToken = await admin.auth().createCustomToken(userId)
-  const userCredentials = await firebase.auth().signInWithCustomToken(customToken)
+  const userCredentials = await signInWithCustomToken(getAuth(), customToken)
   return userCredentials.user.getIdToken()
 }
 
