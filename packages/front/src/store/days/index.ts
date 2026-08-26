@@ -57,7 +57,7 @@ const mutations = {
     // todo refacto on reçoit de la data, on met à jour les objets en local ?
     state.watchingDays = daysService.createDays(days, beginDate, endDate)
   },
-  fetchDaysFail(state: IState, { error }: any) {
+  fetchDaysFail(state: IState, { error }: { error: Error }) {
     state.isLoading = false
     state.error = error.message
   },
@@ -70,7 +70,11 @@ const mutations = {
 }
 const actions = {
   async loadPeriod(
-    { rootGetters, state, commit }: any,
+    {
+      rootGetters,
+      state,
+      commit,
+    }: { rootGetters: Record<string, unknown>; state: IState; commit: Commit },
     { beginDate, endDate }: { beginDate: MenuDate; endDate: MenuDate }
   ) {
     commit('fetchDays', { beginDate, endDate })
@@ -78,13 +82,14 @@ const actions = {
       try {
         const _unsubscribe =
           Api.getInstance().planningService.watchPrimaryPlanningRef(
-            rootGetters['auth/uid'],
+            rootGetters['auth/uid'] as string,
             async (
               planningRef: firebase.firestore.DocumentReference | undefined
             ) => {
               if (planningRef === undefined) {
-                console.info('Profile not found, initializing...')
-                const authUser = rootGetters['auth/user']
+                const authUser = rootGetters[
+                  'auth/user'
+                ] as firebase.User | null
                 if (authUser) {
                   try {
                     await Api.getInstance().planningService.initializeUser(
@@ -133,7 +138,10 @@ const actions = {
       }
     })
   },
-  update({ state, commit }: any, arg: any) {
+  update(
+    { state, commit }: { state: IState; commit: Commit },
+    arg: { meal: MealPeriod; date: MenuDate; value: string }
+  ) {
     if (state.openedDay) {
       // Apply the local mutation first so `x` below reflects the value that
       // was just typed. Building `x` before this commit would snapshot the
@@ -147,7 +155,9 @@ const actions = {
         lunch: state.openedDay.lunch,
       }
       Api.getInstance()
-        .dayService.updateDay(state.planningRef, x)
+        // state.openedDay is only ever populated (via loadPeriod/openDay)
+        // once planningRef has already been resolved and set.
+        .dayService.updateDay(state.planningRef!, x)
         .then(() => {
           commit('savedSuccess')
         })
@@ -182,10 +192,10 @@ const actions = {
       commit('openDay', { day: existingDay })
     }
   },
-  closeDay({ commit }: any) {
+  closeDay({ commit }: { commit: Commit }) {
     commit('closeDay')
   },
-  unsubscribe({ state }: any) {
+  unsubscribe({ state }: { state: IState }) {
     if (state.unsubscribe) {
       state.unsubscribe()
     }

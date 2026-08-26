@@ -43,6 +43,13 @@ import { DEFAULT_MAIN_PAGE_PATH } from '@/router-names'
 
 export default {
   name: 'SignSin',
+  async beforeRouteEnter(to, from, next) {
+    if (store.state.auth.user) {
+      next(DEFAULT_MAIN_PAGE_PATH)
+    } else {
+      next()
+    }
+  },
   data() {
     return {
       publicPath: process.env.BASE_URL,
@@ -50,13 +57,6 @@ export default {
   },
   computed: {
     ...mapGetters({ user: 'auth/user' }),
-  },
-  async beforeRouteEnter(to, from, next) {
-    if (store.state.auth.user) {
-      next(DEFAULT_MAIN_PAGE_PATH)
-    } else {
-      next()
-    }
   },
   methods: {
     authenticate() {

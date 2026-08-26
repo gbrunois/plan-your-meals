@@ -35,7 +35,7 @@ export class Api {
     this.isInitialized = false
   }
 
-  public async init(): Promise<any> {
+  public async init(): Promise<void> {
     if (this.isInitialized) {
       return Promise.resolve()
     }

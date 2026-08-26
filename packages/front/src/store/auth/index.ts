@@ -1,5 +1,6 @@
 import authService from '@/api/auth/auth.service'
 import type firebase from 'firebase/compat/app'
+import { Commit, Dispatch } from 'vuex'
 import { IState } from './types'
 
 const inLocalStorageUid = localStorage.getItem('authUser')
@@ -35,29 +36,36 @@ export default {
     // Functions equivalent (initializeUser) currently can't be reached
     // (public HTTPS invocation is blocked by a GCP IAM/org policy on the
     // 2nd Gen Cloud Run services), so we don't depend on it client-side.
-    async signIn({ commit }: any) {
-      return authService.signInWithGoogleWithPopup().then((result: any) => {
-        if (result && result.user) {
-          commit('setUser', result.user)
-        }
-      })
+    async signIn({ commit }: { commit: Commit }) {
+      return authService
+        .signInWithGoogleWithPopup()
+        .then((result: void | firebase.auth.UserCredential) => {
+          if (result && result.user) {
+            commit('setUser', result.user)
+          }
+        })
     },
-    deleteAccount({ commit, dispatch }: any) {
+    deleteAccount({
+      commit,
+      dispatch,
+    }: {
+      commit: Commit
+      dispatch: Dispatch
+    }) {
       return dispatch('days/unsubscribe', undefined, { root: true }).then(() =>
         authService.deleteAccount().then(() => {
           commit('setUser', null)
         })
       )
     },
-    watchUserAuthenticated({ commit }: any) {
+    watchUserAuthenticated({ commit }: { commit: Commit }) {
       commit('setWaitForAuthenticatedState', true)
       authService.onAuthStateChanged((_user: firebase.User | null) => {
-        console.info('Auth state changed:', { uid: _user?.uid || 'none' })
         commit('setUser', _user)
         commit('setWaitForAuthenticatedState', false)
       })
     },
-    logout({ commit, dispatch }: any) {
+    logout({ commit, dispatch }: { commit: Commit; dispatch: Dispatch }) {
       return dispatch('days/unsubscribe', undefined, { root: true }).then(() =>
         authService.signOut().then(() => {
           commit('setUser', null)

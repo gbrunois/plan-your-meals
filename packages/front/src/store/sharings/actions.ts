@@ -19,11 +19,11 @@ import type { IFirestorePlanning } from '@/api/plannings/planning.type'
 
 // TODO use planning id in cache instead of get from FS
 async function getPrimaryPlanningRef(
-  rootGetters: any
+  rootGetters: Record<string, unknown>
 ): Promise<firebase.firestore.DocumentReference<IFirestorePlanning>> {
   const userPrimaryPlanningRef =
     await Api.getInstance().planningService.getPrimaryPlanningRef(
-      rootGetters['auth/uid']
+      rootGetters['auth/uid'] as string
     )
   if (userPrimaryPlanningRef === undefined) {
     throw new Error('unknown primary planning')

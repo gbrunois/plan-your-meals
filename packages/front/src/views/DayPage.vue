@@ -21,15 +21,21 @@ import MealComponent from './components/MealComponent.vue'
 
 export default {
   name: 'Day',
-  created() {
-    const date = getDateFromUrlParamsOrToday(this.$route.params)
-    this.$store.dispatch('days/openDay', date)
+  components: {
+    meal: MealComponent,
   },
   computed: {
     ...mapGetters({ day: 'days/openedDay' }),
   },
-  components: {
-    meal: MealComponent,
+  watch: {
+    $route(to) {
+      const date = getDateFromUrlParamsOrToday(to.params)
+      this.$store.dispatch('days/openDay', date)
+    },
+  },
+  created() {
+    const date = getDateFromUrlParamsOrToday(this.$route.params)
+    this.$store.dispatch('days/openDay', date)
   },
   methods: {
     goToPreviousDay() {
@@ -59,12 +65,6 @@ export default {
           day: splits[2],
         },
       })
-    },
-  },
-  watch: {
-    $route(to) {
-      const date = getDateFromUrlParamsOrToday(to.params)
-      this.$store.dispatch('days/openDay', date)
     },
   },
 }

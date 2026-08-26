@@ -34,23 +34,6 @@ export default {
       isApiLoading: true,
     }
   },
-  created() {
-    console.info('App.created: Initializing API...')
-    this.isApiLoading = true
-    Api.getInstance()
-      .init()
-      .then(() => {
-        console.info(
-          'App.created: API initialized. Dispatching watchUserAuthenticated...'
-        )
-        store.dispatch('auth/watchUserAuthenticated')
-        this.isApiLoading = false
-      })
-      .catch((err) => {
-        console.error('App.created: API initialization failed:', err)
-        this.isApiLoading = false
-      })
-  },
   computed: {
     ...mapGetters({
       user: 'auth/user',
@@ -70,6 +53,19 @@ export default {
         router.push(DEFAULT_MAIN_PAGE_PATH)
       }
     },
+  },
+  created() {
+    this.isApiLoading = true
+    Api.getInstance()
+      .init()
+      .then(() => {
+        store.dispatch('auth/watchUserAuthenticated')
+        this.isApiLoading = false
+      })
+      .catch((err) => {
+        console.error('App.created: API initialization failed:', err)
+        this.isApiLoading = false
+      })
   },
 }
 </script>

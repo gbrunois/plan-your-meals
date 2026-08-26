@@ -12,7 +12,24 @@
 <script>
 export default {
   name: 'Meal',
-  props: ['label', 'day', 'meal', 'disabled'],
+  props: {
+    label: {
+      type: String,
+      required: true,
+    },
+    day: {
+      type: Object,
+      required: true,
+    },
+    meal: {
+      type: String,
+      required: true,
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+  },
   data() {
     return {
       timer: null,

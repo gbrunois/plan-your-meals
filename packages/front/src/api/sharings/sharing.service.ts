@@ -22,7 +22,11 @@ const apiUrl = config.cloudFunctionsUrl
 
 // TODO Move it to another file
 type HttpMethod = 'put' | 'post' | 'delete'
-async function requestApi<T>(method: HttpMethod, endPoint: string, data?: any) {
+async function requestApi<T>(
+  method: HttpMethod,
+  endPoint: string,
+  data?: unknown
+) {
   const url = `${apiUrl}/${endPoint}`
   const user = auth.currentUser
   if (!user) {
@@ -31,8 +35,11 @@ async function requestApi<T>(method: HttpMethod, endPoint: string, data?: any) {
   let idToken
   try {
     idToken = await user.getIdToken()
-  } catch (error: any) {
-    console.error('Error caught getIdToken', error.message)
+  } catch (error: unknown) {
+    console.error(
+      'Error caught getIdToken',
+      error instanceof Error ? error.message : error
+    )
     throw error
   }
   const response = await axios.request<T>({

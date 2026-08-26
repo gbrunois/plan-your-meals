@@ -33,7 +33,10 @@ module.exports = {
   ],
 
   rules: {
-    'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'warn',
+    'no-console': [
+      process.env.NODE_ENV === 'production' ? 'error' : 'warn',
+      { allow: ['error'] }, // console.error is legitimate error reporting; console.log/info/debug are not
+    ],
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'warn',
     'vue/multi-word-component-names': 'off',
     '@typescript-eslint/no-explicit-any': 'warn',

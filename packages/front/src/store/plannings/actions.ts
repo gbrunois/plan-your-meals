@@ -19,11 +19,11 @@ import { IState } from './types'
 
 // TODO use planning id in cache instead of get from FS
 async function getPrimaryPlanningRef(
-  rootGetters: any
+  rootGetters: Record<string, unknown>
 ): Promise<firebase.firestore.DocumentReference<IFirestorePlanning>> {
   const userPrimaryPlanningRef =
     await Api.getInstance().planningService.getPrimaryPlanningRef(
-      rootGetters['auth/uid']
+      rootGetters['auth/uid'] as string
     )
   if (userPrimaryPlanningRef === undefined) {
     throw new Error('unknown primary planning')
@@ -41,7 +41,7 @@ const fetchMyPlannings: IActionWithoutPayload<IState> = async ({
     const userPrimaryPlanningRef =
       (await getPrimaryPlanningRef(rootGetters)) || {}
     const plannings = await planningService.getMyPlannings(
-      rootGetters['auth/uid']
+      rootGetters['auth/uid'] as string
     )
 
     commit(FETCH_PLANNINGS_SUCCEEDED, {
@@ -69,7 +69,7 @@ const synchronizePendingRequests: IActionWithoutPayload<IState> = async ({
   commit(SYNCHRONIZE_PENDING_REQUESTS)
   try {
     Api.getInstance().userService.setPrimaryPlanning(
-      rootGetters['auth/uid'],
+      rootGetters['auth/uid'] as string,
       state.pendingState.newPrimaryPlanningId
     )
     commit(SYNCHRONIZE_PENDING_REQUESTS_SUCCEEDED)
