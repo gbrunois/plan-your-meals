@@ -1,9 +1,20 @@
+import * as admin from 'firebase-admin'
 import api from './api/app'
 import * as _ from 'lodash'
-import { onAuthUserCreated, onAuthUserDeleted } from './profile'
+import { onAuthUserCreated } from './profile'
 import { onRequest } from 'firebase-functions/v2/https'
 import { onDocumentDeleted } from 'firebase-functions/v2/firestore'
 import { config } from './services/config-service'
+import { firestoreServices } from './services/firestore-service'
+import { IUser } from './types/types'
+
+// Every service in src/ (firestore-service.ts, auth-service.ts...) calls
+// admin.firestore()/admin.auth() assuming a default app already exists, but
+// nothing was ever calling admin.initializeApp() - masked until now because
+// both HTTPS functions return 403 in production before reaching this code
+// (see CLAUDE.md), and nothing exercised onUserDeleted/initializeUser
+// end-to-end either.
+admin.initializeApp()
 
 const region = 'europe-west1'
 
@@ -73,10 +84,18 @@ exports.onUserDeleted = onDocumentDeleted(
   async (event) => {
     try {
       const userId = event.params.userId
-      const user = {
-        uid: userId,
+      // `firestoreServices.getUser(userId)` would always come back
+      // not-found here - the deletion that triggered this already
+      // committed by the time this runs - so `own_planning` has to come
+      // from the event's own last-known snapshot instead of a re-fetch
+      // (this is also why `profile/index.ts#onAuthUserDeleted`, written
+      // for an Auth-side onDelete trigger where the doc still exists, was
+      // never actually deleting the planning when wired to this trigger).
+      const deletedUser = event.data?.data() as IUser | undefined
+      if (deletedUser?.own_planning) {
+        await firestoreServices.deletePlanning(deletedUser.own_planning)
       }
-      await onAuthUserDeleted(user as any)
+      await firestoreServices.deleteUser(userId)
     } catch (error: any) {
       console.error('Error deleting user:', error)
     }

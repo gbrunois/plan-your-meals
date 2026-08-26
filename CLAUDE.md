@@ -37,7 +37,7 @@ this as the cwd, running from repo root fails):
 npm run test                                    # jest unit tests (*.spec.ts, co-located with source)
 npx jest --config ./jest.conf.js src/services/string-utils.spec.ts   # single test file
 npx jest --config ./jest.conf.js -t "<test name>"                    # single test by name
-npm run integration                             # jest integration tests (tests/integrations), hits real Firestore via a service account — needs packages/functions/.env
+npm run integration                             # jest integration tests (tests/integrations); real Firestore via a service account (needs .env) unless FIRESTORE_EMULATOR_HOST etc. point it at a local emulator — see "Integration tests against the emulator" below
 npm run build                                   # tsc -> lib/
 ```
 
@@ -98,6 +98,131 @@ invocation, not an application bug. Don't assume calls to
 (profile bootstrap doesn't depend on it) but the sharing-by-email API
 (`app.ts`'s `/plannings/:planningid/sharings` routes) does, so invite-by-email
 is effectively broken until that's resolved. See `TODO.md`.
+
+### Integration tests against the emulator
+
+`tests/integrations/utils.ts#initFirebaseApp`/`functionsBaseUrl` switch to the
+Firebase Emulator Suite (no real project/creds) whenever
+`FIRESTORE_EMULATOR_HOST` is set. To run `npm run integration` that way:
+
+1. Start the emulators in Docker (the image already bundles a compatible
+   JDK + firebase-tools + Node — see
+   https://github.com/AndreySenov/firebase-tools-docker):
+   ```bash
+   docker run -p 9199:9199 -p 9099:9099 -p 9005:9005 -p 9000:9000 -p 8085:8085 \
+     -p 8080:8080 -p 5001:5001 -p 5000:5000 -p 4000:4000 \
+     -e EMAIL_TRANSPORT=json \
+     -v $PWD:/home/node --name firebase-tools andreysenov/firebase-tools \
+     firebase emulators:start
+   ```
+   `-e EMAIL_TRANSPORT=json` is for the container's own process (the actual
+   `sendInvitation`/`createSharing` code runs *inside* it) - passing that
+   var to `npm run integration` on the host later only affects jest's own
+   process, not this one; without it here every sharing-creation call 500s
+   trying real Gmail SMTP.
+
+   That `docker run` only works once - `--name firebase-tools` fails on a
+   name already in use if the container still exists (stopped or running).
+   To reuse it later, `docker start firebase-tools` (container currently
+   stopped) or `docker restart firebase-tools` (currently running).
+   Either way this re-runs `firebase emulators:start` from scratch, so
+   Firestore/Auth data (in-memory, no `--export-on-exit`/`--import`) is
+   reset regardless - there's no "resume where I left off" here. Repeat
+   step 3's readiness poll after either. Only `docker rm firebase-tools` +
+   the `docker run` above again if you need to change its flags (ports,
+   env, mounted path).
+   `.firebaserc`'s `default` project alias must be a `demo-*` id (this repo
+   uses `demo-whats-for-dinner-id`) so firebase-tools runs fully offline.
+   `firebase.json`'s `emulators.*.host` are set to `0.0.0.0` — without that,
+   auth/functions/UI bind to the container's loopback only and are
+   unreachable from outside it even with the ports published (firestore
+   happens to default to `0.0.0.0` already, which is why only that one
+   "worked" before this was added).
+2. **If you're on Colima (`docker context ls` shows `colima` current) rather
+   than Docker Desktop**: gRPC (gRPC-js talking to the Firestore emulator,
+   i.e. anything through `firebase-admin`/`firestore-service.ts`) fails with
+   `14 UNAVAILABLE: ... Protocol error` when reached through the published
+   port — reproduces with a bare `curl --http2-prior-knowledge
+   http://127.0.0.1:8080/`, works fine with the same command run inside the
+   container (`docker exec`). Neither `--network host` nor Colima's
+   `--port-forwarder grpc` (vs. its default `ssh`) fix it - this looks
+   inherent to relaying raw HTTP/2 "prior knowledge" (no ALPN negotiation)
+   through *any* userspace proxy. The fix is `colima start
+   --network-address`, then point `FIRESTORE_EMULATOR_HOST` /
+   `FIREBASE_AUTH_EMULATOR_HOST` at the VM's own routable IP (`colima
+   status`, e.g. `192.168.64.2`) instead of `127.0.0.1` - that reaches the
+   container through the VM's real kernel NAT instead of a relayed port,
+   and HTTP/2 survives intact.
+3. **Important: give every exported function time to become routable, not
+   just `api`.** Each one (`api`, `initializeUser`, `onUserDeleted`) seems
+   to finish registering independently a few seconds apart; polling only
+   `api` and then immediately running tests reliably fails *every* test
+   that calls `initializeUser` (`Request failed with status code 404`)
+   even though the emulator UI already reports "all emulators ready". Poll
+   `initializeUser` too (expect 401, not 404, for a bare unauthenticated
+   POST) before running anything:
+   ```bash
+   until [ "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5001/demo-whats-for-dinner-id/europe-west1/api)" != "000" ]; do sleep 1; done
+   until [ "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://127.0.0.1:5001/demo-whats-for-dinner-id/europe-west1/initializeUser)" != "404" ]; do sleep 1; done
+   ```
+4. Run the tests with those env vars, e.g.:
+   ```bash
+   FIRESTORE_EMULATOR_HOST=192.168.64.2:8080 \
+   FIREBASE_AUTH_EMULATOR_HOST=192.168.64.2:9099 \
+   GCLOUD_PROJECT=demo-whats-for-dinner-id \
+   EMAIL_TRANSPORT=json \
+   npm run integration
+   ```
+   (this `EMAIL_TRANSPORT=json` is for jest's own process, in addition to
+   the one passed to `docker run` above)
+
+   `jest.conf.integration.js` also loads
+   `../global-fetch-polyfill.js` (jest 24's bundled `jest-environment-node`
+   predates Node's global `fetch`, needed by the `firebase/auth` client SDK)
+   and `../patch-node-builtin-prefix.js` via `NODE_OPTIONS` in the
+   `integration` npm script (jest 24's module resolver predates `node:`-
+   prefixed core imports, which `firebase-admin`'s current
+   Firestore/`google-gax` dependency chain uses).
+
+All of `tests/integrations/*.spec.ts` pass against the emulator with the
+above. Getting there surfaced (and fixed) real bugs nothing had ever
+exercised before, since both HTTPS functions return 403 in production
+before reaching this code (see above) and nothing had run them locally
+end-to-end either:
+- `src/index.ts` never called `admin.initializeApp()` at all - every
+  `admin.firestore()`/`admin.auth()` call from *inside* a Cloud Function
+  (as opposed to the test driver, which initializes its own) threw "The
+  default Firebase app does not exist".
+- `firestore-service.ts#resetUserPrimaryPlanningWithOwnPlanning` did
+  `if (user) { user.data()... }` - `getUser()` always resolves to a
+  `DocumentSnapshot`, even when the doc doesn't exist, so this crashed
+  instead of skipping, on precisely the case (a just-deleted user) that
+  the delete-cascade code path exists to handle.
+- `onUserDeleted` (`onDocumentDeleted('users/{userId}', ...)`) delegated to
+  `profile/index.ts#onAuthUserDeleted`, which only deletes the owner's
+  planning `if (doc.exists)` - written for an *Auth* onDelete trigger where
+  the Firestore doc would still exist, but by the time a *Firestore*
+  delete trigger fires the doc is already gone, so that branch was dead
+  code. Fixed by reading `own_planning` from the trigger event's own
+  pre-deletion snapshot (`event.data`) instead of re-fetching.
+- `utils.ts`'s `createUser`/`deleteUsers` assumed Auth user
+  creation/deletion has Firestore-side effects (auto-provisioning /
+  auto-cleanup) that don't exist - see "New user bootstrap" above. They now
+  call `initializeUser` and delete the Firestore data explicitly instead of
+  polling for a cascade that was never going to happen.
+- `tests/integrations/utils.ts#waitFor`'s retry was a
+  `new Promise((resolve) => ...)` that never called `reject`: any error
+  (including its own timeout) was thrown from inside a `.then`/`.catch`
+  with nothing left to catch it, becoming an unhandled rejection on a
+  promise chain nobody awaited. The outer promise just hung forever
+  instead of failing (jest only ever "caught" it by misattributing the
+  unhandled rejection to whichever test happened to be running).
+- Through this same Docker/Colima path, the *first* HTTP/1.1 request on a
+  fresh connection occasionally comes back as a spurious 404 (the
+  emulator's own router seems to sometimes misread the first packet(s) of
+  a new connection) - `utils.ts#postWithRetry` retries once on a 404 to
+  paper over it; this is an environment quirk, not an application bug, and
+  never reproduces on a warm connection.
 
 ### Front (`packages/front`)
 

@@ -586,7 +586,11 @@ async function resetUserPrimaryPlanningWithOwnPlanning(
   oldPlanningRef: DocumentReference<IPlanning>,
 ) {
   const user = await firestoreServices.getUser(userRef.id)
-  if (user) {
+  // `getUser()` always resolves to a DocumentSnapshot, even when the doc
+  // doesn't exist (e.g. this user was already deleted) - `if (user)` was
+  // always true, so `user.data()` being undefined crashed here instead of
+  // just skipping the reset.
+  if (user.exists) {
     const userData = user.data()
     if (userData.primary_planning.id === oldPlanningRef.id) {
       await user.ref.update({ primary_planning: userData.own_planning })
