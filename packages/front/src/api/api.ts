@@ -1,7 +1,6 @@
 import 'firebase/compat/auth'
 import 'firebase/compat/firestore'
 import { DayService } from './days/day.service'
-import { database } from './firebaseService'
 import { PlanningService } from './plannings/planning.service'
 import { UserService } from './auth/user.service'
 import { SharingService } from './sharings/sharing.service'
