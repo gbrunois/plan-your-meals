@@ -21,7 +21,7 @@ import {
 } from '../types/types'
 import * as _ from 'lodash'
 import { removeDotsInEmail } from './string-utils'
-import { FirestoreDataConverter, QueryDocumentSnapshot, DocumentData, WithFieldValue } from 'firebase-admin/firestore'
+import { QueryDocumentSnapshot } from 'firebase-admin/firestore'
 
 
 const planningSharingConverter = {

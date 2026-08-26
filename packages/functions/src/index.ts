@@ -42,9 +42,6 @@ exports.initializeUser = onRequest(
         return
       }
 
-      // Extract token and verify user
-      const token = authHeader.replace('Bearer ', '')
-
       // Get user data from request body
       const { uid, email, displayName } = req.body || {}
 
