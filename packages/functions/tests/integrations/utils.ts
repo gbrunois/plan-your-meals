@@ -100,12 +100,12 @@ export function initFirebaseApp() {
     // FIREBASE_AUTH_EMULATOR_HOST (set by `firebase emulators:exec`) make the
     // Admin SDK talk to the local emulators instead of a real project.
     const projectId = process.env.GCLOUD_PROJECT || EMULATOR_PROJECT_ID
-    const app = admin.initializeApp({ projectId })
+    const emulatorApp = admin.initializeApp({ projectId })
     const clientApp = firebase.initializeApp({ apiKey: 'demo-api-key', projectId })
     if (process.env.FIREBASE_AUTH_EMULATOR_HOST) {
       connectAuthEmulator(getAuth(clientApp), `http://${process.env.FIREBASE_AUTH_EMULATOR_HOST}`)
     }
-    return app
+    return emulatorApp
   }
 
   const app = admin.initializeApp({
