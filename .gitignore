@@ -6,6 +6,16 @@ node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.npm/
+# firebase-tools/emulator debug logs — land wherever `firebase`/emulators:start
+# is run from (repo root when running the Docker emulator recipe in
+# CLAUDE.md, packages/functions for everything else)
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+database-debug.log
+pubsub-debug.log
+extensions-debug.log
 
 # Editor directories and files
 .idea
@@ -24,14 +34,13 @@ packages/functions/node_modules
 
 packages/front/node_modules
 packages/front/dist
-packages/front/firebase-debug.log
 packages/functions/conversation.txt
-packages/functions/firebase-debug.log
-packages/dialogflow-e2e/private-key
-packages/dialogflow-e2e/botiumwork
-packages/dialogflow-e2e/botium.json
-packages/dialogflow-e2e/googleConfig.json
 .env*
-packages/dialogflow-e2e/firebase-debug.log
-scripts/backup-dialogflow-agent/node_modules
+!.env.example
 secrets
+
+# Contains real Firebase project IDs — never commit, see .firebaserc.example
+.firebaserc
+
+# Contains emulator config — never commit, see .firebaserc.example
+.config

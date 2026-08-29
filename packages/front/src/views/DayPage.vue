@@ -1,10 +1,10 @@
 <template>
   <v-row
-    class="fill-height"
     v-touch="{
       left: () => goToNextDay(),
       right: () => goToPreviousDay(),
     }"
+    class="fill-height"
   >
     <v-col v-if="day" class="mt-2">
       <meal label="Midi" :day="day" meal="lunch"></meal>
@@ -20,16 +20,22 @@ import { mapGetters } from 'vuex'
 import MealComponent from './components/MealComponent.vue'
 
 export default {
-  name: 'day',
-  created() {
-    const date = getDateFromUrlParamsOrToday(this.$route.params)
-    this.$store.dispatch('days/openDay', date)
+  name: 'Day',
+  components: {
+    meal: MealComponent,
   },
   computed: {
     ...mapGetters({ day: 'days/openedDay' }),
   },
-  components: {
-    meal: MealComponent,
+  watch: {
+    $route(to) {
+      const date = getDateFromUrlParamsOrToday(to.params)
+      this.$store.dispatch('days/openDay', date)
+    },
+  },
+  created() {
+    const date = getDateFromUrlParamsOrToday(this.$route.params)
+    this.$store.dispatch('days/openDay', date)
   },
   methods: {
     goToPreviousDay() {
@@ -59,12 +65,6 @@ export default {
           day: splits[2],
         },
       })
-    },
-  },
-  watch: {
-    $route(to) {
-      const date = getDateFromUrlParamsOrToday(to.params)
-      this.$store.dispatch('days/openDay', date)
     },
   },
 }

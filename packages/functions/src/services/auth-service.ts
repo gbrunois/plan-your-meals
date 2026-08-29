@@ -1,6 +1,7 @@
-import { UserRecord } from 'firebase-functions/lib/providers/auth'
+
 import admin = require('firebase-admin')
 import { Response, Request, NextFunction } from 'express'
+import { UserRecord } from 'firebase-admin/auth'
 
 export interface AuthenticatedRequest extends Request {
   user: admin.auth.DecodedIdToken

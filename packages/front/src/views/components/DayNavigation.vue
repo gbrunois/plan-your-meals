@@ -2,23 +2,21 @@
   <div class="d-flex justify-space-between mx-2">
     <v-btn
       class="align-self-start"
-      color="primary"
-      small
-      dark
-      fab
+      color="white"
+      size="small"
+      icon
       @click="goToPreviousDay()"
     >
       <v-icon>mdi-chevron-left</v-icon>
     </v-btn>
-    <div class="my-auto" v-if="openedDay">
+    <div v-if="openedDay" class="my-auto">
       {{ openedDay.date.toLongFormat() }}
     </div>
     <v-btn
       class="align-self-end"
-      color="primary"
-      small
-      dark
-      fab
+      color="white"
+      size="small"
+      icon
       @click="goToNextDay()"
     >
       <v-icon>mdi-chevron-right</v-icon>

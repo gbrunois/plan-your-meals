@@ -1,5 +1,4 @@
-#Warning :
-Enable dialogflow webhook before deploy firebase cloud function
+# Preparation
 
 - Launch Unit tests
 
@@ -14,16 +13,6 @@ npm run deploy
 ```
 
 # Prepare your environment
-
-## Dialogflow
-
-- Create an action on google project
-- Add Web site Owner [https://search.google.com/search-console]
-- Account linking : copy the key and execute :
-
-```
-firebase functions:config:set dialogflow.client_id=<API_KEY>
-```
 
 ## Cloud functions
 

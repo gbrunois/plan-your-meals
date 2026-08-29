@@ -1,11 +1,11 @@
-import firebase from 'firebase/app'
-import 'firebase/auth'
+import firebase from 'firebase/compat/app'
+import 'firebase/compat/auth'
 import { auth } from '../firebaseService'
 
 class AuthService {
   public signInWithGoogleWithPopup(): Promise<void | firebase.auth.UserCredential> {
     const provider = new firebase.auth.GoogleAuthProvider()
-    return auth.signInWithPopup(provider).catch((error: any) => {
+    return auth.signInWithPopup(provider).catch((error: unknown) => {
       console.error(error)
     })
   }
@@ -14,15 +14,19 @@ class AuthService {
     const provider = new firebase.auth.GoogleAuthProvider()
     return auth
       .signInWithRedirect(provider)
-      .catch((error: any) => console.error(error))
+      .catch((error: unknown) => console.error(error))
     // TODO display error to client
+  }
+
+  public getRedirectResult(): Promise<firebase.auth.UserCredential> {
+    return auth.getRedirectResult()
   }
 
   public signOut() {
     return auth.signOut()
   }
 
-  public onAuthStateChanged(callback: (user: firebase.User | null) => any) {
+  public onAuthStateChanged(callback: (user: firebase.User | null) => void) {
     return auth.onAuthStateChanged(callback)
   }
 

@@ -1,14 +1,17 @@
+import type firebase from 'firebase/compat/app'
 import {
-  IFirestoreSharing,
   Sharing,
   SharingBuilder,
-  IFirestorePendingSharing,
   PendingSharingBuilder,
   PendingSharing,
-} from './sharing.type'
+} from '../sharings/sharing.type'
+import type {
+  IFirestoreSharing,
+  IFirestorePendingSharing,
+} from '../sharings/sharing.type'
 import axios from 'axios'
 import { auth } from '../firebaseService'
-import { IFirestorePlanning } from '../plannings/planning.type'
+import type { IFirestorePlanning } from '../plannings/planning.type'
 import { genericConverter } from '../api'
 import config from '../../../config'
 
@@ -19,7 +22,11 @@ const apiUrl = config.cloudFunctionsUrl
 
 // TODO Move it to another file
 type HttpMethod = 'put' | 'post' | 'delete'
-async function requestApi<T>(method: HttpMethod, endPoint: string, data?: any) {
+async function requestApi<T>(
+  method: HttpMethod,
+  endPoint: string,
+  data?: unknown
+) {
   const url = `${apiUrl}/${endPoint}`
   const user = auth.currentUser
   if (!user) {
@@ -28,8 +35,11 @@ async function requestApi<T>(method: HttpMethod, endPoint: string, data?: any) {
   let idToken
   try {
     idToken = await user.getIdToken()
-  } catch (error) {
-    console.error('Error caught getIdToken', error.message)
+  } catch (error: unknown) {
+    console.error(
+      'Error caught getIdToken',
+      error instanceof Error ? error.message : error
+    )
     throw error
   }
   const response = await axios.request<T>({
@@ -75,7 +85,7 @@ export class SharingService {
         const result: Sharing[] = []
         querySnapshot.forEach((doc) => {
           const data = doc.data()
-          result.push(SharingBuilder.build(doc.id, data))
+          result.push(SharingBuilder.build(doc.id, data as IFirestoreSharing))
         })
         return result
       })
@@ -93,7 +103,12 @@ export class SharingService {
         const result: PendingSharing[] = []
         querySnapshot.forEach((doc) => {
           const data = doc.data()
-          result.push(PendingSharingBuilder.build(doc.id, data))
+          result.push(
+            PendingSharingBuilder.build(
+              doc.id,
+              data as IFirestorePendingSharing
+            )
+          )
         })
         return result
       })

@@ -21,7 +21,7 @@
       </div>
     </v-col>
     <v-col cols="12" class="text-center">
-      <v-btn @click="authenticate" color="secondary">
+      <v-btn color="secondary" @click="authenticate">
         <v-icon left dark>mdi-google</v-icon>Me connecter avec Google
       </v-btn>
     </v-col>
@@ -39,10 +39,17 @@
 <script>
 import store from '@/store'
 import { mapGetters } from 'vuex'
-import { DEFAULT_MAIN_PAGE_PATH } from '../router'
+import { DEFAULT_MAIN_PAGE_PATH } from '@/router-names'
 
 export default {
-  name: 'signSin',
+  name: 'SignSin',
+  async beforeRouteEnter(to, from, next) {
+    if (store.state.auth.user) {
+      next(DEFAULT_MAIN_PAGE_PATH)
+    } else {
+      next()
+    }
+  },
   data() {
     return {
       publicPath: process.env.BASE_URL,
@@ -50,13 +57,6 @@ export default {
   },
   computed: {
     ...mapGetters({ user: 'auth/user' }),
-  },
-  async beforeRouteEnter(to, from, next) {
-    if (store.state.auth.user) {
-      next(DEFAULT_MAIN_PAGE_PATH)
-    } else {
-      next()
-    }
   },
   methods: {
     authenticate() {

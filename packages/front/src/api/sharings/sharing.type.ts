@@ -12,7 +12,10 @@ export class Sharing {
   }
 }
 export class PendingSharing {
-  constructor(readonly id: string, readonly userEmail: string) {}
+  constructor(
+    readonly id: string,
+    readonly userEmail: string
+  ) {}
 
   toString(): string {
     return this.id

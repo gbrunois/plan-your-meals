@@ -2,10 +2,9 @@
   <div class="d-flex justify-space-between mx-2">
     <v-btn
       class="align-self-start"
-      color="primary"
-      small
-      dark
-      fab
+      color="white"
+      size="small"
+      icon
       @click="goToPreviousWeek()"
     >
       <v-icon>mdi-chevron-left</v-icon>
@@ -13,10 +12,9 @@
     <div class="my-auto">{{ currentPeriod }}</div>
     <v-btn
       class="align-self-end"
-      color="primary"
-      small
-      dark
-      fab
+      color="white"
+      size="small"
+      icon
       @click="goToNextWeek()"
     >
       <v-icon>mdi-chevron-right</v-icon>
@@ -27,7 +25,7 @@
 <script>
 import { daysService } from '@/services/days.service'
 import { mapGetters } from 'vuex'
-import { DEFAULT_MAIN_PAGE_PATH, WEEK_PAGE_NAME } from '../../router'
+import { WEEK_PAGE_NAME } from '@/router-names'
 
 export default {
   computed: {

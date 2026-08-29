@@ -19,7 +19,7 @@ export type IAction<S, P> = (
     dispatch: Dispatch
     state: S
     rootState: IRootState
-    rootGetters: any
+    rootGetters: Record<string, unknown>
   },
   payload: P
 ) => void
@@ -33,5 +33,5 @@ export type IActionWithoutPayload<S> = ({
   commit: Commit
   dispatch: Dispatch
   state: S
-  rootGetters: any
+  rootGetters: Record<string, unknown>
 }) => void

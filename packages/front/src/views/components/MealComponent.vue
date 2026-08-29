@@ -1,32 +1,54 @@
 <template>
   <v-textarea
-    @change="onChange($event)"
-    @input="onUpdate($event)"
-    @
-    v-model="day[meal]"
-    filled
+    :model-value="day[meal]"
+    variant="filled"
     :label="label"
     no-resize
     :disabled="disabled"
+    @update:model-value="onUpdate($event)"
   ></v-textarea>
 </template>
 
 <script>
 export default {
-  name: 'meal',
+  name: 'Meal',
+  props: {
+    label: {
+      type: String,
+      required: true,
+    },
+    day: {
+      type: Object,
+      required: true,
+    },
+    meal: {
+      type: String,
+      required: true,
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  data() {
+    return {
+      timer: null,
+    }
+  },
+  unmounted() {
+    if (this.timer) {
+      clearTimeout(this.timer)
+    }
+  },
   methods: {
     onUpdate(event) {
       // defer
-      clearTimeout(this.timer)
+      if (this.timer) {
+        clearTimeout(this.timer)
+      }
       this.timer = setTimeout(() => {
         this.updateStore(event)
       }, 500)
-    },
-    onChange(event) {
-      this.updateStore(event)
-    },
-    destroyed() {
-      this.timer = undefined
     },
     updateStore(event) {
       this.$store.dispatch('days/update', {
@@ -36,14 +58,5 @@ export default {
       })
     },
   },
-  props: ['label', 'day', 'meal', 'disabled'],
 }
 </script>
-<style>
-/* .v-input {
-  flex-direction: column;
-}
-.v-input .v-input__slot {
-  flex: 1 1 auto;
-} */
-</style>
