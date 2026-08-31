@@ -77,7 +77,7 @@ exports.initializeUser = onRequest(
 
 // Cleanup when user document is deleted from Firestore
 exports.onUserDeleted = onDocumentDeleted(
-  'users/{userId}',
+  { document: 'users/{userId}', region },
   async (event) => {
     try {
       const userId = event.params.userId
