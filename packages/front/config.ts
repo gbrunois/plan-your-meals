@@ -7,5 +7,6 @@ const config = {
   messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID,
   appId: import.meta.env.VITE_APP_ID,
   cloudFunctionsUrl: import.meta.env.VITE_CLOUD_FUNCTIONS_URL,
+  googleOAuthClientId: import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID,
 }
 export default config

@@ -25,6 +25,12 @@ export default defineConfig({
         // Default globPatterns already cover dist/**/*.{js,css,html,...};
         // explicit here so new asset types added later are still cached.
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2,ttf,eot}'],
+        // Without these, a new service worker sits in "waiting" until every
+        // tab for this origin is closed (not just refreshed) - deployed
+        // fixes silently don't reach anyone still on an open tab, including
+        // during our own testing just now.
+        skipWaiting: true,
+        clientsClaim: true,
       },
     }),
   ],

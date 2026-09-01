@@ -21,7 +21,7 @@
       </div>
     </v-col>
     <v-col cols="12" class="text-center">
-      <v-btn color="secondary" @click="authenticate">
+      <v-btn color="secondary" :disabled="signingIn" @click="authenticate">
         <v-icon left dark>mdi-google</v-icon>Me connecter avec Google
       </v-btn>
     </v-col>
@@ -52,7 +52,8 @@ export default {
   },
   data() {
     return {
-      publicPath: process.env.BASE_URL,
+      publicPath: import.meta.env.BASE_URL,
+      signingIn: false,
     }
   },
   computed: {
@@ -60,7 +61,16 @@ export default {
   },
   methods: {
     authenticate() {
-      this.$store.dispatch('auth/signIn')
+      // Guard against a repeat click firing a second sign-in attempt while
+      // the first is still in flight.
+      if (this.signingIn) return
+      this.signingIn = true
+      this.$store
+        .dispatch('auth/signIn')
+        .catch((error) => console.error('Sign in failed:', error)) // TODO display error to client
+        .finally(() => {
+          this.signingIn = false
+        })
     },
   },
 }

@@ -36,11 +36,16 @@ export default {
     // Functions equivalent (initializeUser) currently can't be reached
     // (public HTTPS invocation is blocked by a GCP IAM/org policy on the
     // 2nd Gen Cloud Run services), so we don't depend on it client-side.
+    // Neither signInWithPopup nor signInWithRedirect complete for this
+    // project - both route through a Google-hosted /__/auth/handler page
+    // that silently does nothing on return (see auth.service.ts). Signing
+    // in via Google Identity Services + signInWithCredential avoids that
+    // handler entirely.
     async signIn({ commit }: { commit: Commit }) {
       return authService
-        .signInWithGoogleWithPopup()
-        .then((result: void | firebase.auth.UserCredential) => {
-          if (result && result.user) {
+        .signInWithGoogle()
+        .then((result: firebase.auth.UserCredential) => {
+          if (result.user) {
             commit('setUser', result.user)
           }
         })
