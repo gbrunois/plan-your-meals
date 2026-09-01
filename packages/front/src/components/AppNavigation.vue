@@ -77,6 +77,9 @@
         </v-row>
       </template>
     </v-app-bar>
+    <v-snackbar v-model="showSyncErrorSnackbar" color="error" timeout="8000">
+      {{ syncErrorMessage }}
+    </v-snackbar>
     <v-dialog v-model="dialogHasPendingRequests" persistent>
       <v-card>
         <v-card-title class="body-1"
@@ -116,6 +119,8 @@ export default {
       drawer: false,
       version,
       dialogHasPendingRequests: false,
+      showSyncErrorSnackbar: false,
+      syncErrorMessage: '',
     }
   },
   computed: {
@@ -185,10 +190,20 @@ export default {
         })
       }
     },
-    onSaveButtonClick() {
+    async onSaveButtonClick() {
       const storeName = this.$route.meta.storeName
       if (storeName) {
-        this.$store.dispatch(`${storeName}/synchronizePendingRequests`)
+        await this.$store.dispatch(`${storeName}/synchronizePendingRequests`)
+        const error =
+          this.$store.getters[
+            `${storeName}/lastSynchronizingPendingRequestsError`
+          ]
+        if (error) {
+          this.syncErrorMessage =
+            "Erreur lors de l'enregistrement, veuillez réessayer."
+          this.showSyncErrorSnackbar = true
+          return
+        }
       }
       this.goBack()
     },
