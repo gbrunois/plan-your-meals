@@ -1,13 +1,20 @@
 {
   "name": "plan-your-meals",
-  "version": "0.2.18",
+  "version": "0.2.19",
   "description": "",
-  "main": "index.js",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "bootstrap": "lerna bootstrap --ignore-scripts",
-    "lint": "cd packages/front && npm run lint",
-    "build": "lerna run build",
-    "test": "lerna run test"
+    "front": "npm run dev -w @plan-your-meals/front",
+    "build": "npm run build --workspaces",
+    "build:prod": "npm run build -w @plan-your-meals/front -- --mode production",
+    "lint": "npm run lint --workspaces",
+    "test": "npm run test --workspaces",
+    "bootstrap": "npm install --workspaces",
+    "deploy:dev": "firebase deploy --project dev",
+    "deploy:prod": "npm run build:prod && firebase deploy --project prod"
   },
   "repository": {
     "type": "git",
@@ -17,8 +24,5 @@
   "bugs": {
     "url": "https://github.com/gbrunois/plan-your-meals/issues"
   },
-  "homepage": "https://github.com/gbrunois/plan-your-meals#readme",
-  "devDependencies": {
-    "lerna": "^3.22.1"
-  }
+  "homepage": "https://github.com/gbrunois/plan-your-meals#readme"
 }

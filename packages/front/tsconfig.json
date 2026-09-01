@@ -10,10 +10,12 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
+    "skipLibCheck": true,
     "baseUrl": ".",
+    "noEmit": true,
     "types": [
-      "webpack-env",
-      "jest"
+      "vite/client",
+      "vitest/globals"
     ],
     "paths": {
       "@/*": [

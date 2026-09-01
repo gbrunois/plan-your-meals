@@ -1,4 +1,6 @@
 import authService from '@/api/auth/auth.service'
+import type firebase from 'firebase/compat/app'
+import { Commit, Dispatch } from 'vuex'
 import { IState } from './types'
 
 const inLocalStorageUid = localStorage.getItem('authUser')
@@ -27,24 +29,48 @@ export default {
     },
   },
   actions: {
-    async signIn() {
-      return authService.signInWithGoogleWithRedirect()
+    // Note: user profile / planning initialization is NOT done here.
+    // It's handled directly against Firestore (client SDK) in
+    // store/days -> Api.planningService.initializeUser(), the first time
+    // a user without a primary_planning is detected. The backend Cloud
+    // Functions equivalent (initializeUser) currently can't be reached
+    // (public HTTPS invocation is blocked by a GCP IAM/org policy on the
+    // 2nd Gen Cloud Run services), so we don't depend on it client-side.
+    // Neither signInWithPopup nor signInWithRedirect complete for this
+    // project - both route through a Google-hosted /__/auth/handler page
+    // that silently does nothing on return (see auth.service.ts). Signing
+    // in via Google Identity Services + signInWithCredential avoids that
+    // handler entirely.
+    async signIn({ commit }: { commit: Commit }) {
+      return authService
+        .signInWithGoogle()
+        .then((result: firebase.auth.UserCredential) => {
+          if (result.user) {
+            commit('setUser', result.user)
+          }
+        })
     },
-    deleteAccount({ commit, dispatch }: any) {
+    deleteAccount({
+      commit,
+      dispatch,
+    }: {
+      commit: Commit
+      dispatch: Dispatch
+    }) {
       return dispatch('days/unsubscribe', undefined, { root: true }).then(() =>
         authService.deleteAccount().then(() => {
           commit('setUser', null)
         })
       )
     },
-    watchUserAuthenticated({ commit }: any) {
+    watchUserAuthenticated({ commit }: { commit: Commit }) {
       commit('setWaitForAuthenticatedState', true)
-      authService.onAuthStateChanged((user: firebase.User | null) => {
-        commit('setUser', user)
+      authService.onAuthStateChanged((_user: firebase.User | null) => {
+        commit('setUser', _user)
         commit('setWaitForAuthenticatedState', false)
       })
     },
-    logout({ commit, dispatch }: any) {
+    logout({ commit, dispatch }: { commit: Commit; dispatch: Dispatch }) {
       return dispatch('days/unsubscribe', undefined, { root: true }).then(() =>
         authService.signOut().then(() => {
           commit('setUser', null)

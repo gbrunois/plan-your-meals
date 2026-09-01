@@ -1,3 +1,4 @@
+import type firebase from 'firebase/compat/app'
 import { DayMenu } from '@/api/days/day-menu'
 import { MenuDate } from '@/api/days/menu-date'
 
@@ -10,4 +11,5 @@ export interface IState {
   status: string
   error?: string
   unsubscribe?: () => void
+  planningRef?: firebase.firestore.DocumentReference
 }

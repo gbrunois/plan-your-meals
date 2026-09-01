@@ -2,47 +2,33 @@
   <div>
     <v-navigation-drawer v-if="user" v-model="drawer" temporary app>
       <v-list class="pa-0" subheader>
-        <v-list-item v-if="user !== null" class="light">
-          <v-list-item-avatar>
-            <img :src="user.photoURL" />
-          </v-list-item-avatar>
-          <v-list-item-content>
-            <v-list-item-title>{{ user.displayName }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+        <v-list-item
+          v-if="user !== null"
+          class="light"
+          :prepend-avatar="user.photoURL"
+          :title="user.displayName"
+        ></v-list-item>
         <v-divider></v-divider>
-        <v-list-item @click="navigateToSharingsPage()">
-          <v-list-item-action>
-            <v-icon>mdi-share</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>Mes partages</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item @click="navigateToMyPlannings()">
-          <v-list-item-action>
-            <v-icon>mdi-calendar-multiple-check</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>Mes plannings</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item @click="navigateToSettings()">
-          <v-list-item-action>
-            <v-icon>mdi-settings</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>Paramètres</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item @click="logout()">
-          <v-list-item-action>
-            <v-icon>mdi-logout</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>Déconnecter</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+        <v-list-item
+          prepend-icon="mdi-share"
+          title="Mes partages"
+          @click="navigateToSharingsPage()"
+        ></v-list-item>
+        <v-list-item
+          prepend-icon="mdi-calendar-multiple-check"
+          title="Mes plannings"
+          @click="navigateToMyPlannings()"
+        ></v-list-item>
+        <v-list-item
+          prepend-icon="mdi-settings"
+          title="Paramètres"
+          @click="navigateToSettings()"
+        ></v-list-item>
+        <v-list-item
+          prepend-icon="mdi-logout"
+          title="Déconnecter"
+          @click="logout()"
+        ></v-list-item>
       </v-list>
       <v-divider></v-divider>
       <v-list class="pt-0" dense>
@@ -70,25 +56,30 @@
         >Enregistrer</v-btn
       >
       <v-app-bar-nav-icon
-        @click.stop="onTodayButtonClick"
         v-if="showToolbarExtension"
+        @click.stop="onTodayButtonClick"
       >
         <v-icon>mdi-calendar</v-icon>
       </v-app-bar-nav-icon>
-      <v-row slot="extension" v-if="showToolbarExtension" no-gutters>
-        <v-col cols="12">
-          <component v-bind:is="currentTabComponent"></component>
-        </v-col>
-        <v-col class="flex-progress-linear" cols="12">
-          <v-progress-linear
-            class="mx-0 my-1"
-            :indeterminate="true"
-            v-if="isLoading"
-            color="white"
-          ></v-progress-linear>
-        </v-col>
-      </v-row>
+      <template #extension>
+        <v-row v-if="showToolbarExtension" no-gutters>
+          <v-col cols="12">
+            <component :is="currentTabComponent"></component>
+          </v-col>
+          <v-col class="flex-progress-linear" cols="12">
+            <v-progress-linear
+              v-if="isLoading"
+              class="mx-0 my-1"
+              :indeterminate="true"
+              color="white"
+            ></v-progress-linear>
+          </v-col>
+        </v-row>
+      </template>
     </v-app-bar>
+    <v-snackbar v-model="showSyncErrorSnackbar" color="error" timeout="8000">
+      {{ syncErrorMessage }}
+    </v-snackbar>
     <v-dialog v-model="dialogHasPendingRequests" persistent>
       <v-card>
         <v-card-title class="body-1"
@@ -115,7 +106,7 @@
 import { version } from '../../package.json'
 import DayNavigation from '../views/components/DayNavigation.vue'
 import WeekNavigation from '../views/components/WeekNavigation.vue'
-import { DEFAULT_MAIN_PAGE_PATH, DEFAULT_MAIN_PAGE_NAME } from '../router.ts'
+import { DEFAULT_MAIN_PAGE_PATH, DEFAULT_MAIN_PAGE_NAME } from '@/router-names'
 
 export default {
   name: 'AppNavigation',
@@ -128,6 +119,8 @@ export default {
       drawer: false,
       version,
       dialogHasPendingRequests: false,
+      showSyncErrorSnackbar: false,
+      syncErrorMessage: '',
     }
   },
   computed: {
@@ -197,10 +190,20 @@ export default {
         })
       }
     },
-    onSaveButtonClick() {
+    async onSaveButtonClick() {
       const storeName = this.$route.meta.storeName
       if (storeName) {
-        this.$store.dispatch(`${storeName}/synchronizePendingRequests`)
+        await this.$store.dispatch(`${storeName}/synchronizePendingRequests`)
+        const error =
+          this.$store.getters[
+            `${storeName}/lastSynchronizingPendingRequestsError`
+          ]
+        if (error) {
+          this.syncErrorMessage =
+            "Erreur lors de l'enregistrement, veuillez réessayer."
+          this.showSyncErrorSnackbar = true
+          return
+        }
       }
       this.goBack()
     },

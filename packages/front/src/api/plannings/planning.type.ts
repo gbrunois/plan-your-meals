@@ -1,4 +1,4 @@
-import { firestore } from 'firebase'
+import firebase from 'firebase/compat/app'
 
 export class SharedPlanning {
   constructor(
@@ -39,5 +39,5 @@ export interface IFirestorePlanning {
 export interface IFirestoreUserSharing {
   owner_name: string
   is_owner: boolean
-  planning: firestore.DocumentReference<IFirestorePlanning>
+  planning: firebase.firestore.DocumentReference<IFirestorePlanning>
 }

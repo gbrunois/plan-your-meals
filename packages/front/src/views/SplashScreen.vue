@@ -22,7 +22,12 @@
 <script>
 export default {
   name: 'LoadingScreen',
-  props: ['isLoading'],
+  props: {
+    isLoading: {
+      type: Boolean,
+      default: false,
+    },
+  },
 }
 </script>
 

@@ -1,4 +1,5 @@
 import { MenuDate } from '@/api/days/menu-date'
+import { describe, expect, it } from 'vitest'
 
 describe('MenuDate', () => {
   describe('toString', () => {

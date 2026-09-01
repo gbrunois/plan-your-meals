@@ -1,6 +1,6 @@
 import { Sharing, PendingSharing } from '@/api/sharings/sharing.type'
 
-function clearArray(array: any[]) {
+function clearArray<T>(array: T[]) {
   array.splice(0, array.length)
 }
 

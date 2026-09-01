@@ -1,5 +1,6 @@
 import { daysService } from '@/services/days.service'
 import { MenuDate } from '@/api/days/menu-date.ts'
+import { describe, expect, it } from 'vitest'
 
 describe('Service - DaysService', () => {
   it('build a day', () => {

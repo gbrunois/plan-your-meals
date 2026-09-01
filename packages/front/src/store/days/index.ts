@@ -1,4 +1,5 @@
 import { Api } from '@/api/api'
+import type firebase from 'firebase/compat/app'
 import { DayMenu } from '@/api/days/day-menu'
 import { MealPeriod } from '@/api/days/meal-period.type'
 import { MenuDate } from '@/api/days/menu-date'
@@ -56,7 +57,7 @@ const mutations = {
     // todo refacto on reçoit de la data, on met à jour les objets en local ?
     state.watchingDays = daysService.createDays(days, beginDate, endDate)
   },
-  fetchDaysFail(state: IState, { error }: any) {
+  fetchDaysFail(state: IState, { error }: { error: Error }) {
     state.isLoading = false
     state.error = error.message
   },
@@ -69,49 +70,84 @@ const mutations = {
 }
 const actions = {
   async loadPeriod(
-    { rootGetters, state, commit }: any,
+    {
+      rootGetters,
+      state,
+      commit,
+    }: { rootGetters: Record<string, unknown>; state: IState; commit: Commit },
     { beginDate, endDate }: { beginDate: MenuDate; endDate: MenuDate }
   ) {
     commit('fetchDays', { beginDate, endDate })
     return new Promise<DayMenu[]>((resolve, reject) => {
       try {
-        const unsubscribe = Api.getInstance().planningService.watchPrimaryPlanningRef(
-          rootGetters['auth/uid'],
-          (planningRef: firebase.firestore.DocumentReference | undefined) => {
-            if (planningRef === undefined) {
-              console.error('unknown primary planning')
-              throw new Error('unknown primary planning')
-            } else {
-              unsubscribe()
-              state.planningRef = planningRef
-              state.unsubscribe = Api.getInstance().dayService.watchPeriod(
-                planningRef,
-                beginDate,
-                endDate,
-                (days) => {
-                  resolve(days)
-                  commit('fetchDaysSuccess', { beginDate, endDate, days })
-                },
-                (error: Error) => {
+        const _unsubscribe =
+          Api.getInstance().planningService.watchPrimaryPlanningRef(
+            rootGetters['auth/uid'] as string,
+            async (
+              planningRef: firebase.firestore.DocumentReference | undefined
+            ) => {
+              if (planningRef === undefined) {
+                const authUser = rootGetters[
+                  'auth/user'
+                ] as firebase.User | null
+                if (authUser) {
+                  try {
+                    await Api.getInstance().planningService.initializeUser(
+                      authUser
+                    )
+                    // The onSnapshot listener will trigger again once the doc is created
+                  } catch (error) {
+                    console.error('Failed to initialize user profile:', error)
+                    commit('fetchDaysFail', { error })
+                    reject(error)
+                  }
+                } else {
+                  console.error('User is not authenticated')
+                  const error = new Error('User is not authenticated')
                   commit('fetchDaysFail', { error })
                   reject(error)
                 }
-              )
+              } else {
+                if (state.unsubscribe) {
+                  state.unsubscribe()
+                }
+                state.planningRef = planningRef
+                state.unsubscribe = Api.getInstance().dayService.watchPeriod(
+                  planningRef,
+                  beginDate,
+                  endDate,
+                  (days) => {
+                    resolve(days)
+                    commit('fetchDaysSuccess', { beginDate, endDate, days })
+                  },
+                  (error: Error) => {
+                    commit('fetchDaysFail', { error })
+                    reject(error)
+                  }
+                )
+              }
+            },
+            (error: Error) => {
+              commit('fetchDaysFail', { error })
+              reject(error)
             }
-          },
-          (error: Error) => {
-            commit('fetchDaysFail', { error })
-            reject(error)
-          }
-        )
+          )
       } catch (error) {
         commit('fetchDaysFail', { error })
         reject(error)
       }
     })
   },
-  update({ state, commit }: any, arg: any) {
+  update(
+    { state, commit }: { state: IState; commit: Commit },
+    arg: { meal: MealPeriod; date: MenuDate; value: string }
+  ) {
     if (state.openedDay) {
+      // Apply the local mutation first so `x` below reflects the value that
+      // was just typed. Building `x` before this commit would snapshot the
+      // *previous* value of the field being edited, sending stale data to
+      // Firestore (one edit behind) every time.
+      commit('update', arg)
       commit('saving')
       const x = {
         date: state.openedDay.date,
@@ -119,14 +155,15 @@ const actions = {
         lunch: state.openedDay.lunch,
       }
       Api.getInstance()
-        .dayService.updateDay(state.planningRef, x)
+        // state.openedDay is only ever populated (via loadPeriod/openDay)
+        // once planningRef has already been resolved and set.
+        .dayService.updateDay(state.planningRef!, x)
         .then(() => {
           commit('savedSuccess')
         })
         .catch(() => {
           commit('savedFailed')
         })
-      commit('update', arg)
     }
   },
   async openDay(
@@ -155,10 +192,10 @@ const actions = {
       commit('openDay', { day: existingDay })
     }
   },
-  closeDay({ commit }: any) {
+  closeDay({ commit }: { commit: Commit }) {
     commit('closeDay')
   },
-  unsubscribe({ state }: any) {
+  unsubscribe({ state }: { state: IState }) {
     if (state.unsubscribe) {
       state.unsubscribe()
     }

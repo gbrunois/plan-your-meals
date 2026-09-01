@@ -19,6 +19,9 @@ const getters = {
   hasPendingRequests: (state: IState) => {
     return state.pendingState.hasPendingRequests()
   },
+  lastSynchronizingPendingRequestsError: (state: IState) => {
+    return state.lastSynchronizingPendingRequestsError
+  },
 }
 
 export default {

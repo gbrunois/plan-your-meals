@@ -2,7 +2,7 @@ const Mustache = require('mustache')
 import * as fs from 'fs'
 import * as path from 'path'
 import { emailServices } from './email-service'
-import { UserRecord } from 'firebase-functions/lib/providers/auth'
+import { UserRecord } from 'firebase-admin/auth'
 import { config } from './config-service'
 import { firestoreServices } from './firestore-service'
 import { DocumentReference } from '@google-cloud/firestore'
