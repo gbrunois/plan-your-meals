@@ -88,7 +88,7 @@ app.post(
           .runTransaction(async (t) => {
             if (!planningSharing.exists)
               await firestoreServices.createPlanningSharing(userToShare, planningRef, false, t)
-            if (!userSharing.exists)
+            if (!userSharing || !userSharing.exists)
               await firestoreServices.createUserSharing(userToShare, planningRef, false, currentUser.displayName, t)
           })
           .then(() => invitationServices.sendInvitation(currentUser, userToShare.email, false))

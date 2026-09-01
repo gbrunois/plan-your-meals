@@ -78,7 +78,8 @@ export default {
     return {
       email: '',
       rules: {
-        email: (value) => Utils.emailIsValid(value) || 'E-mail invalide',
+        email: (value) =>
+          Utils.emailIsValid((value || '').trim()) || 'E-mail invalide',
       },
     }
   },
@@ -96,8 +97,9 @@ export default {
   },
   methods: {
     addSharing() {
-      if (Utils.emailIsValid(this.email)) {
-        this.$store.dispatch('sharings/addNewSharing', this.email)
+      const email = this.email.trim()
+      if (Utils.emailIsValid(email)) {
+        this.$store.dispatch('sharings/addNewSharing', email)
 
         this.email = ''
         this.$refs.inputEmail.resetValidation()
