@@ -1,0 +1,59 @@
+name: Integration Tests
+
+# Runs packages/functions' integration suite against the real Firebase
+# Emulator Suite (Firestore + Auth + Functions) - no live project/creds
+# needed. Unlike local dev (see CLAUDE.md's "Integration tests against the
+# emulator"), this doesn't need Docker/Colima at all: that setup exists
+# specifically to work around a Colima-on-macOS gRPC/HTTP2 routing quirk
+# when relaying through a VM's forwarded ports. GitHub's Ubuntu runners have
+# no such VM layer, so `firebase emulators:exec` can run directly on the
+# runner and talk to 127.0.0.1 without issue.
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches:
+      - master
+      - develop
+  workflow_dispatch:
+
+jobs:
+  integration-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Java (required by the Firestore/Auth emulators)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build functions
+        run: npm run build -w @plan-your-meals/functions
+
+      - name: Run integration tests against the Firebase Emulator Suite
+        working-directory: packages/functions
+        env:
+          # jest's own process (see CLAUDE.md) - the emulators themselves
+          # never send real email either way in this setup.
+          EMAIL_TRANSPORT: json
+        run: |
+          npx firebase-tools emulators:exec \
+            --project demo-whats-for-dinner-id \
+            --only auth,firestore,functions \
+            "npm run integration"
