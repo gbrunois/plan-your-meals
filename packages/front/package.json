@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@mdi/font": "^4.9.95",
-    "axios": "^1.6.0",
+    "axios": "^1.18.0",
     "dayjs": "^1.10.7",
     "firebase": "^10.0.0",
     "register-service-worker": "^1.7.2",
