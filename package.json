@@ -24,5 +24,8 @@
   "bugs": {
     "url": "https://github.com/gbrunois/plan-your-meals/issues"
   },
-  "homepage": "https://github.com/gbrunois/plan-your-meals#readme"
+  "homepage": "https://github.com/gbrunois/plan-your-meals#readme",
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
 }
