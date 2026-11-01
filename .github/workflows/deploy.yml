@@ -64,6 +64,40 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
+  # Keeps develop from drifting behind master (release commits, hotfixes):
+  # opens a master -> develop PR when develop is missing master commits. It
+  # must be merged with a *merge commit* (squash/rebase would rewrite the SHAs
+  # and make the branches diverge). PRs opened with GITHUB_TOKEN don't trigger
+  # workflows, so checks won't run on it.
+  sync-develop:
+    if: github.event_name == 'push' && github.ref_name == 'master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Open master -> develop PR if develop is behind
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          behind=$(git rev-list --count origin/develop..origin/master)
+          if [ "$behind" = "0" ]; then
+            echo "develop is up to date"
+            exit 0
+          fi
+          if [ -n "$(gh pr list --base develop --head master --state open --json number --jq '.[].number')" ]; then
+            echo "sync PR already open"
+            exit 0
+          fi
+          gh pr create --base develop --head master \
+            --title "chore: sync master into develop" \
+            --body "develop is $behind commit(s) behind master. Merge with a **merge commit** (not squash/rebase) so both branches keep the same history."
+
   # push on develop -> `dev` environment, release created on master -> `prod`. Each
   # GitHub environment holds the same secret names, with that project's values:
   #   FIREBASERC      content of .firebaserc (has both aliases)
