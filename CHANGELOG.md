@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/gbrunois/plan-your-meals/compare/v1.1.1...v1.2.0) (2026-11-01)
+
+
+### Features
+
+* **front:** calendar view with week and month modes ([#243](https://github.com/gbrunois/plan-your-meals/issues/243)) ([ee5e4e7](https://github.com/gbrunois/plan-your-meals/commit/ee5e4e7b19c16b21b8faba9b704be36234208196))
+
 ## [1.1.1](https://github.com/gbrunois/plan-your-meals/compare/v1.1.0...v1.1.1) (2026-11-01)
 
 
