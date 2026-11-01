@@ -3,8 +3,9 @@ updates:
   # Dependency PRs go to `develop` (deployed to dev first), then reach
   # `master` through the regular develop -> master promotion + release.
   - package-ecosystem: npm
+    # Not `/`: the root only holds the workspaces' lockfile, bumps there
+    # duplicate the per-package ones.
     directories:
-      - /
       - /packages/front
       - /packages/functions
     target-branch: develop
