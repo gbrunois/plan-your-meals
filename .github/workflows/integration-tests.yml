@@ -31,8 +31,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
+
+      - name: Upgrade npm (the one bundled with Node 22 crashes on our lockfile)
+        run: npm install -g npm@11
 
       - name: Setup Java (required by the Firestore/Auth emulators;
           firebase-tools 15.x requires 21+)
