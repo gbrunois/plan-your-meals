@@ -2,7 +2,7 @@
   "name": "@plan-your-meals/functions",
   "description": "whats for dinner firebase functions",
   "engines": {
-    "node": "20"
+    "node": "22"
   },
   "scripts": {
     "lint": "tslint --project tsconfig.json",
@@ -24,7 +24,7 @@
   "main": "lib/src/index.js",
   "dependencies": {
     "@google-cloud/firestore": "^7.11.6",
-    "axios": "^0.33.0",
+    "axios": "^0.34.0",
     "cors": "^2.8.5",
     "dotenv": "^8.6.0",
     "express": "^4.22.1",
@@ -34,7 +34,7 @@
     "lodash": "^4.17.21",
     "morgan": "^1.12.1",
     "mustache": "^4.2.0",
-    "nodemailer": "^6.6.5"
+    "nodemailer": "^10.1.4"
   },
   "devDependencies": {
     "@types/aws-sdk": "^2.7.4",
