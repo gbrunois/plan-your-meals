@@ -19,6 +19,10 @@ export class MenuDate {
     return dayjs(this.dateString, FORMAT).format('dddd Do MMMM')
   }
 
+  public toMonthFormat(): string {
+    return dayjs(this.dateString, FORMAT).format('MMMM YYYY')
+  }
+
   public toShortFormat(): string {
     return dayjs(this.dateString, FORMAT).format('Do MMMM')
   }

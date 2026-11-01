@@ -1,14 +1,13 @@
 import store from '@/store'
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw, RouteLocationNormalized } from 'vue-router'
-import DayPage from './views/DayPage.vue'
 import MyPlanningsPage from './views/MyPlannings.vue'
 import PrivacyPolicyPage from './views/PrivacyPolicy.vue'
 import SettingsPage from './views/Settings.vue'
 import SharingsPage from './views/Sharings.vue'
 import SignInPage from './views/SignIn.vue'
 import TermsOfServicePage from './views/TermsOfService.vue'
-import WeekPage from './views/WeekPage.vue'
+import CalendarPage from './views/CalendarPage.vue'
 
 import {
   SIGNIN_PAGE_NAME,
@@ -34,35 +33,21 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: DEFAULT_MAIN_PAGE_PATH,
     name: DEFAULT_MAIN_PAGE_NAME,
-    component: WeekPage,
+    component: CalendarPage,
     meta: {
       title: 'Plan your meals',
       authRequired: true,
-      showToolbarExtension: true,
-      navigationComponent: 'week-navigation',
+      isCalendar: true,
     },
   },
   {
     path: '/week/:year/:month/:day',
     name: WEEK_PAGE_NAME,
-    component: WeekPage,
+    component: CalendarPage,
     meta: {
       title: 'Plan your meals',
       authRequired: true,
-      showToolbarExtension: true,
-      navigationComponent: 'week-navigation',
-    },
-  },
-  {
-    path: '/day/:year/:month/:day',
-    name: 'day',
-    component: DayPage,
-    meta: {
-      title: 'Plan your meals',
-      authRequired: true,
-      showBackButton: true,
-      showToolbarExtension: true,
-      navigationComponent: 'day-navigation',
+      isCalendar: true,
     },
   },
   {

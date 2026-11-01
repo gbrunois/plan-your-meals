@@ -1,7 +1,13 @@
 <template>
-  <v-row class="fill-height">
-    <v-col class="text-center">
-      <delete-account-button />
+  <v-row class="fill-height align-start" no-gutters>
+    <v-col class="pa-0">
+      <v-card
+        rounded="lg"
+        elevation="1"
+        class="overflow-hidden pa-4 text-center"
+      >
+        <delete-account-button />
+      </v-card>
     </v-col>
   </v-row>
 </template>

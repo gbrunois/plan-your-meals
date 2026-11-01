@@ -33,11 +33,15 @@ export default {
   data() {
     return {
       timer: null,
+      pendingValue: '',
     }
   },
   unmounted() {
+    // flush the pending edit rather than dropping it: the opened day is
+    // still this meal's day while the detail closes
     if (this.timer) {
       clearTimeout(this.timer)
+      this.updateStore(this.pendingValue)
     }
   },
   methods: {
@@ -46,7 +50,9 @@ export default {
       if (this.timer) {
         clearTimeout(this.timer)
       }
+      this.pendingValue = event
       this.timer = setTimeout(() => {
+        this.timer = null
         this.updateStore(event)
       }, 500)
     },

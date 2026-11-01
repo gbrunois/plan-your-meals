@@ -1,4 +1,5 @@
 import { MenuDate } from '@/api/days/menu-date'
+import { WEEK_PAGE_NAME } from '@/router-names'
 import { daysService } from './days.service'
 
 export function getDateFromUrlParamsOrToday(params: {
@@ -12,4 +13,9 @@ export function getDateFromUrlParamsOrToday(params: {
   } else {
     return new MenuDate(`${year}-${month}-${day}`)
   }
+}
+
+export function toCalendarRoute(date: MenuDate) {
+  const [year, month, day] = date.toString().split('-')
+  return { name: WEEK_PAGE_NAME, params: { year, month, day } }
 }
