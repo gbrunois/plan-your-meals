@@ -9,10 +9,11 @@ on:
     branches:
       - master
       - develop
-  workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  # Runs on every push and PR, without any secret (PRs, e.g. Dependabot's,
+  # don't get them).
+  verify:
     runs-on: ubuntu-latest
 
     steps:
@@ -39,16 +40,54 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy to Firebase (Dev)
-        if: github.ref == 'refs/heads/develop' || github.event_name == 'workflow_dispatch'
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_DEV_TOKEN }}
-        # Project IDs are kept out of the repo (public GitHub); set them as
-        # repo/environment secrets instead of hardcoding them here.
-        run: npx firebase-tools deploy -f --project "${{ secrets.FIREBASE_DEV_PROJECT_ID }}" --token "$FIREBASE_TOKEN"
+  # push on develop -> `dev` environment, push on master -> `prod`. Each
+  # GitHub environment holds the same secret names, with that project's values:
+  #   FIREBASERC      content of .firebaserc (has both aliases)
+  #   FRONT_ENV       content of packages/front/.env.<development|production>
+  #   FUNCTIONS_ENV   content of packages/functions/.env.<dev|prod>
+  #   FIREBASE_TOKEN  firebase login:ci token
+  # The env files are gitignored (public repo), so they are rebuilt from the
+  # secrets before building.
+  deploy:
+    needs: verify
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
+    env:
+      FIREBASE_ALIAS: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
+      VITE_MODE: ${{ github.ref_name == 'master' && 'production' || 'development' }}
 
-      - name: Deploy to Firebase (Prod)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm install
+          npm run bootstrap
+
+      - name: Restore env files
         env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_PROD_TOKEN }}
-        run: npx firebase-tools deploy -f --project "${{ secrets.FIREBASE_PROD_PROJECT_ID }}" --token "$FIREBASE_TOKEN"
+          FIREBASERC: ${{ secrets.FIREBASERC }}
+          FRONT_ENV: ${{ secrets.FRONT_ENV }}
+          FUNCTIONS_ENV: ${{ secrets.FUNCTIONS_ENV }}
+        run: |
+          printf '%s' "$FIREBASERC" > .firebaserc
+          printf '%s' "$FRONT_ENV" > "packages/front/.env.$VITE_MODE"
+          printf '%s' "$FUNCTIONS_ENV" > "packages/functions/.env.$FIREBASE_ALIAS"
+
+      - name: Build
+        run: |
+          npm run build -w @plan-your-meals/front -- --mode "$VITE_MODE"
+          npm run build -w @plan-your-meals/functions
+
+      - name: Deploy to Firebase
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: npx firebase-tools deploy -f --project "$FIREBASE_ALIAS" --token "$FIREBASE_TOKEN"
