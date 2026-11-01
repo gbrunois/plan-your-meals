@@ -13,6 +13,12 @@ updates:
       interval: weekly
     commit-message:
       prefix: 'chore(deps)'
+    ignore:
+      # Pinned to v2 on purpose: the integration tests' fetch polyfill
+      # (packages/functions/global-fetch-polyfill.js) must be loadable by
+      # jest 24, which can't run node-fetch v3 (ESM only).
+      - dependency-name: node-fetch
+        update-types: ['version-update:semver-major']
   - package-ecosystem: github-actions
     directory: /
     target-branch: develop
