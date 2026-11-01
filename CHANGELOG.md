@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/gbrunois/plan-your-meals/compare/v1.1.0...v1.1.1) (2026-11-01)
+
+
+### Bug Fixes
+
+* keep front package version in sync with releases ([#237](https://github.com/gbrunois/plan-your-meals/issues/237)) ([eeb9a52](https://github.com/gbrunois/plan-your-meals/commit/eeb9a525e13249129ed321138ff690a468a962c5))
+
 ## [1.1.0](https://github.com/gbrunois/plan-your-meals/compare/v1.0.2...v1.1.0) (2026-11-01)
 
 
