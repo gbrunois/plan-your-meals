@@ -64,13 +64,14 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
-  # Keeps develop from drifting behind master (release commits, hotfixes):
-  # opens a master -> develop PR when develop is missing master commits. It
-  # must be merged with a *merge commit* (squash/rebase would rewrite the SHAs
+  # The release commit only exists on master, so once a release is created,
+  # opens a master -> develop PR to bring it back (nothing happens if develop
+  # already has it or such a PR is open). It must be merged with a *merge commit* (squash/rebase would rewrite the SHAs
   # and make the branches diverge). PRs opened with GITHUB_TOKEN don't trigger
   # workflows, so checks won't run on it.
   sync-develop:
-    if: github.event_name == 'push' && github.ref_name == 'master'
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
