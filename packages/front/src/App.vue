@@ -69,8 +69,3 @@ export default {
   },
 }
 </script>
-<style>
-.v-toolbar__extension {
-  padding: 0;
-}
-</style>

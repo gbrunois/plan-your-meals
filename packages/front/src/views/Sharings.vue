@@ -1,8 +1,8 @@
 <template>
-  <v-row class="fill-height" align="start">
+  <v-row class="fill-height align-start" no-gutters>
     <v-col class="pa-0">
-      <v-row no-gutters style="background: #fff">
-        <v-col cols="12" class="px-2">
+      <v-card rounded="lg" elevation="1" class="overflow-hidden">
+        <div class="px-4 pt-4">
           <v-text-field
             ref="inputEmail"
             v-model="email"
@@ -14,12 +14,10 @@
             @click:append-inner="addSharing"
             @keypress="onAddSharingInputKeyPress"
           ></v-text-field>
-        </v-col>
-        <v-col cols="12">
-          <v-divider />
-        </v-col>
-        <v-col cols="12">
-          <v-list-subheader class="font-weight-bold"
+        </div>
+        <v-divider />
+        <div>
+          <v-list-subheader class="font-weight-bold px-4"
             >Menus partagés avec</v-list-subheader
           >
           <v-list lines="two">
@@ -64,8 +62,8 @@
               </v-list-item>
             </template>
           </v-list>
-        </v-col>
-      </v-row>
+        </div>
+      </v-card>
     </v-col>
   </v-row>
 </template>
