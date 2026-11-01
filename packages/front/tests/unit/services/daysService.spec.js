@@ -37,6 +37,46 @@ describe('Service - DaysService', () => {
     )
   })
 
+  describe('getPeriod', () => {
+    it('should return the 7 days starting at the date in week mode', () => {
+      expect(daysService.getPeriod(new MenuDate('2018-01-04'), 'week')).toEqual(
+        {
+          beginDate: new MenuDate('2018-01-04'),
+          endDate: new MenuDate('2018-01-10'),
+        }
+      )
+    })
+
+    it('should return every week touching the month in month mode', () => {
+      expect(
+        daysService.getPeriod(new MenuDate('2025-04-07'), 'month')
+      ).toEqual({
+        beginDate: new MenuDate('2025-03-31'),
+        endDate: new MenuDate('2025-05-04'),
+      })
+    })
+  })
+
+  describe('shiftPeriod', () => {
+    it('should move by a week in week mode', () => {
+      expect(
+        daysService.shiftPeriod(new MenuDate('2018-01-04'), 1, 'week')
+      ).toEqual(new MenuDate('2018-01-11'))
+      expect(
+        daysService.shiftPeriod(new MenuDate('2018-01-04'), -1, 'week')
+      ).toEqual(new MenuDate('2017-12-28'))
+    })
+
+    it('should move by a month and clamp to its last day', () => {
+      expect(
+        daysService.shiftPeriod(new MenuDate('2018-01-31'), 1, 'month')
+      ).toEqual(new MenuDate('2018-02-28'))
+      expect(
+        daysService.shiftPeriod(new MenuDate('2018-01-15'), -1, 'month')
+      ).toEqual(new MenuDate('2017-12-15'))
+    })
+  })
+
   describe('createDays', () => {
     it('without existing days', () => {
       expect(daysService.createDays([], '2018-01-01', '2018-01-03')).toEqual([
