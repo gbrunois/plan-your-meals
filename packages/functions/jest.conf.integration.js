@@ -9,6 +9,8 @@ module.exports = {
   // left in firebase-admin 14) don't resolve - point them at the lib/ dirs.
   moduleNameMapper: {
     '^firebase-admin/(.*)$': `${path.dirname(require.resolve('firebase-admin'))}/$1`,
+    // jose 6 (pulled in by jwks-rsa via firebase-admin/auth) is ESM-only.
+    '^jwks-rsa$': '<rootDir>/../jwks-rsa-stub.js',
   },
   transform: {
     '^.+\\.js$': 'babel-jest',
