@@ -1,4 +1,5 @@
-import admin = require('firebase-admin')
+import { App, deleteApp } from 'firebase-admin/app'
+import { getFirestore } from 'firebase-admin/firestore'
 import { config as loadEnvFile } from 'dotenv'
 import { firestoreServices } from '../../src/services/firestore-service'
 import { initFirebaseApp, deleteUsers, createUser, waitDocumentExists, DEFAULT_TIMEOUT, functionsBaseUrl, postWithRetry } from './utils'
@@ -6,7 +7,7 @@ const FAKE_NAME_USER_2 = 'Existing user'
 const FAKE_NAME_USER_1 = 'Invited user'
 
 describe('sharing', () => {
-  let app: admin.app.App
+  let app: App
   let apiUrl: string
   let fakeUserEmail1: string
   let fakeUserEmail2: string
@@ -22,8 +23,8 @@ describe('sharing', () => {
   })
 
   afterAll(async () => {
-    await app.firestore().terminate()
-    await app.delete()
+    await getFirestore(app).terminate()
+    await deleteApp(app)
   })
 
   afterEach(async () => {

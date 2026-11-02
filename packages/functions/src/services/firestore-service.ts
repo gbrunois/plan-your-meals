@@ -4,7 +4,6 @@ import {
   DocumentSnapshot,
   WriteResult,
 } from '@google-cloud/firestore'
-import admin = require('firebase-admin')
 import {
   IPlanning,
   IUser,
@@ -21,7 +20,8 @@ import {
 } from '../types/types'
 import * as _ from 'lodash'
 import { removeDotsInEmail } from './string-utils'
-import { QueryDocumentSnapshot } from 'firebase-admin/firestore'
+import { getFirestore, QueryDocumentSnapshot } from 'firebase-admin/firestore'
+import { UserRecord } from 'firebase-admin/auth'
 
 
 const planningSharingConverter = {
@@ -122,7 +122,7 @@ export const firestoreServices = {
    * @param planningRef The planning reference
    */
   createPlanningSharing(
-    user: admin.auth.UserRecord,
+    user: UserRecord,
     planningRef: DocumentReference,
     isOwner: boolean = false,
     t: Transaction = null,
@@ -151,7 +151,7 @@ export const firestoreServices = {
    * @returns A promise resolved when is written
    */
   createUserSharing(
-    user: admin.auth.UserRecord,
+    user: UserRecord,
     planningRef: DocumentReference<IPlanning>,
     isOwner: boolean,
     ownerName: string,
@@ -274,8 +274,7 @@ export const firestoreServices = {
    */
   getUser(uid: string): Promise<DocumentSnapshot<IUser>> {
     console.log('getUser', uid)
-    return admin
-      .firestore()
+    return getFirestore()
       .collection('users')
       .withConverter(userConverter)
       .doc(uid)
@@ -288,7 +287,7 @@ export const firestoreServices = {
    */
   async deleteUser(userId: string) {
     // TODO use a transaction
-    const database = admin.firestore()
+    const database = getFirestore()
     await database
       .collection(`users/${userId}/sharings`)
       .withConverter(userSharingConverter)
@@ -464,8 +463,7 @@ export const firestoreServices = {
    * @returns A promise resolved with the pending invitations query
    */
   async findPendingInvitations(guestEmail: string) {
-    return admin
-      .firestore()
+    return getFirestore()
       .collection('pending-invitations')
       .withConverter(pendingInvitationConverter)
       .where('guest_email', '==', removeDotsInEmail(guestEmail))
@@ -487,23 +485,20 @@ export const firestoreServices = {
   },
 
   buildUserReference(uid: string): DocumentReference<IUser> {
-    return admin
-      .firestore()
+    return getFirestore()
       .collection('users')
       .withConverter(userConverter)
       .doc(uid)
   },
 
   buildPlanningReference(planningId: string): DocumentReference<IPlanning> {
-    return admin
-      .firestore()
+    return getFirestore()
       .collection('plannings')
       .withConverter(planningConverter)
       .doc(planningId)
   },
   buildNewPlanningReference(): DocumentReference<IPlanning> {
-    return admin
-      .firestore()
+    return getFirestore()
       .collection('plannings')
       .withConverter(planningConverter)
       .doc()
@@ -537,15 +532,13 @@ export const firestoreServices = {
       .doc(sharingId)
   },
   buildNewPendingInvitationReference(): DocumentReference<IPendingInvitation> {
-    return admin
-      .firestore()
+    return getFirestore()
       .collection('pending-invitations')
       .withConverter(pendingInvitationConverter)
       .doc()
   },
   buildNewUserSharingReference(userId: string) {
-    return admin
-      .firestore()
+    return getFirestore()
       .collection(`users/${userId}/sharings/`)
       .withConverter(userSharingConverter)
       .doc()
@@ -569,7 +562,7 @@ export const firestoreServices = {
       return batch.commit()
     }
 
-    const database = admin.firestore()
+    const database = getFirestore()
     const entriesChunks = _.chunk(entries, 400)
     const batchPromises = entriesChunks.map((entriesChunk) => removeEntriesChunk(database, entriesChunk))
     return Promise.all(batchPromises)

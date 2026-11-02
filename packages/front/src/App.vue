@@ -1,6 +1,7 @@
 <template>
   <v-app>
     <app-navigation />
+    <app-bottom-navigation />
     <v-main>
       <splash-screen :is-loading="isLoading" />
       <v-container
@@ -16,6 +17,7 @@
 
 <script>
 import AppNavigation from '@/components/AppNavigation.vue'
+import AppBottomNavigation from '@/components/AppBottomNavigation.vue'
 import store from '@/store'
 import { mapGetters } from 'vuex'
 import { Api } from './api/api'
@@ -27,6 +29,7 @@ export default {
   name: 'App',
   components: {
     AppNavigation,
+    AppBottomNavigation,
     SplashScreen,
   },
   data: () => {

@@ -3,21 +3,17 @@ module.exports = {
   moduleDirectories: ['node_modules', 'src', 'tests'],
   moduleFileExtensions: ['js', 'ts', 'json'],
   transform: {
-    '^.+\\.js$': 'babel-jest',
-    '^.+(?:!\\.d|)\\.ts$': 'ts-jest',
+    '^.+\\.ts$': ['ts-jest', { tsconfig: './tsconfig.json' }],
   },
   testRegex: '(/__tests__/.*|(\\.|/)spec)\\.(jsx?|tsx?)$',
-  globals: {
-    'ts-jest': {
-      tsConfig: './tsconfig.json',
-    },
-  },
   globalSetup: '../global-setup.js',
-  // firebase/auth (client SDK, used by tests/integrations/utils.ts) needs a
-  // global fetch; jest 24's bundled jest-environment-node predates Node's
-  // fetch and never copies it into the test sandbox - see the file for why
-  // it polyfills from node-fetch specifically.
-  setupFiles: ['../global-fetch-polyfill.js'],
+  moduleNameMapper: {
+    // jose 6 (pulled in by jwks-rsa via firebase-admin/auth) is ESM-only, which
+    // jest can't load without a transform. The integration tests never verify
+    // an ID token from the jest process (that happens inside the emulated
+    // functions), so a stub is enough - see the file.
+    '^jwks-rsa$': '<rootDir>/../jwks-rsa-stub.js',
+  },
   testEnvironment: 'node',
   verbose: true,
   testTimeout: 30000,

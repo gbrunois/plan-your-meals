@@ -1,6 +1,10 @@
 <template>
-  <v-row class="fill-height align-start" no-gutters>
-    <v-col class="pa-0">
+  <v-row
+    class="fill-height align-start"
+    no-gutters
+    style="min-width: 0; max-width: 100%"
+  >
+    <v-col class="pa-0" style="min-width: 0">
       <v-card rounded="lg" elevation="1" class="overflow-hidden">
         <v-card-title class="text-h6 text-primary pt-4">{{
           title
