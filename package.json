@@ -27,5 +27,9 @@
   "homepage": "https://github.com/gbrunois/plan-your-meals#readme",
   "devDependencies": {
     "husky": "^9.1.7"
+  },
+  "overrides": {
+    "qs": "^6.16.2",
+    "@grpc/grpc-js": "^1.14.7"
   }
 }

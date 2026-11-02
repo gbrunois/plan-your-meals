@@ -176,13 +176,11 @@ Firebase Emulator Suite (no real project/creds) whenever
    (this `EMAIL_TRANSPORT=json` is for jest's own process, in addition to
    the one passed to `docker run` above)
 
-   `jest.conf.integration.js` also loads
-   `../global-fetch-polyfill.js` (jest 24's bundled `jest-environment-node`
-   predates Node's global `fetch`, needed by the `firebase/auth` client SDK)
-   and `../patch-node-builtin-prefix.js` via `NODE_OPTIONS` in the
-   `integration` npm script (jest 24's module resolver predates `node:`-
-   prefixed core imports, which `firebase-admin`'s current
-   Firestore/`google-gax` dependency chain uses).
+   `jest.conf.integration.js` maps `jwks-rsa` to `jwks-rsa-stub.js`:
+   `firebase-admin/auth` pulls `jwks-rsa` -> `jose` 6, which is ESM-only and
+   can't be loaded by jest without a transform. The tests never verify an ID
+   token from the jest process (that happens inside the emulated functions),
+   so a stub is enough.
 
 All of `tests/integrations/*.spec.ts` pass against the emulator with the
 above. Getting there surfaced (and fixed) real bugs nothing had ever
