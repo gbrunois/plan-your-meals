@@ -1,4 +1,5 @@
-import admin = require('firebase-admin')
+import { App, deleteApp } from 'firebase-admin/app'
+import { getFirestore } from 'firebase-admin/firestore'
 import { config as loadEnvFile } from 'dotenv'
 import { firestoreServices } from '../../src/services/firestore-service'
 import { waitDocumentNotExists, initFirebaseApp, createUser, deleteUsers, DEFAULT_TIMEOUT } from './utils'
@@ -6,7 +7,7 @@ import { waitDocumentNotExists, initFirebaseApp, createUser, deleteUsers, DEFAUL
 const FAKE_USER_NAME = 'Geoffrey'
 
 describe('user', () => {
-  let app: admin.app.App
+  let app: App
   let fakeUserEmail: string
 
   beforeAll(async () => {
@@ -23,8 +24,8 @@ describe('user', () => {
   })
 
   afterAll(async () => {
-    await app.firestore().terminate()
-    await app.delete()
+    await getFirestore(app).terminate()
+    await deleteApp(app)
   })
 
   it('should create a planning and user when a user is created', async () => {

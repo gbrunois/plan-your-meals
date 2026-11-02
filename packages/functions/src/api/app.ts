@@ -1,5 +1,5 @@
 import * as express from 'express'
-import admin = require('firebase-admin')
+import { getFirestore } from 'firebase-admin/firestore'
 import { firestoreServices } from '../services/firestore-service'
 import * as cors from 'cors'
 import * as morgan from 'morgan'
@@ -83,8 +83,7 @@ app.post(
         const planningSharing = await firestoreServices.getPlanningSharing(planningRef, userToShare.uid)
         const userSharing = await firestoreServices.getUserSharing(userToShareDocument.ref, planningRef)
 
-        await admin
-          .firestore()
+        await getFirestore()
           .runTransaction(async (t) => {
             if (!planningSharing.exists)
               await firestoreServices.createPlanningSharing(userToShare, planningRef, false, t)
@@ -125,7 +124,7 @@ app.delete(
     // TODO delete all pendings sharings ?
     console.log('Remove sharing', { currentUserId, planningId, userIdToRemove: sharingIdToRemove })
     try {
-      await admin.firestore().runTransaction(async (t) => {
+      await getFirestore().runTransaction(async (t) => {
         await firestoreServices.deletePlanningSharing(planningRef, sharingIdToRemove, t)
       })
       res.sendStatus(204)
@@ -148,7 +147,7 @@ app.delete(
     console.log('Remove pending sharing', { currentUserId, planningId, sharingIdToRemove })
 
     try {
-      await admin.firestore().runTransaction(async (t) => {
+      await getFirestore().runTransaction(async (t) => {
         await firestoreServices.deletePlanningPendingSharing(planningRef, sharingIdToRemove, t)
       })
       res.sendStatus(204)

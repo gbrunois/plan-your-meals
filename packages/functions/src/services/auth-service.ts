@@ -1,10 +1,9 @@
 
-import admin = require('firebase-admin')
 import { Response, Request, NextFunction } from 'express'
-import { UserRecord } from 'firebase-admin/auth'
+import { DecodedIdToken, getAuth, UserRecord } from 'firebase-admin/auth'
 
 export interface AuthenticatedRequest extends Request {
-  user: admin.auth.DecodedIdToken
+  user: DecodedIdToken
 }
 
 export const authServices = {
@@ -14,7 +13,7 @@ export const authServices = {
   async getUserByEmail(email: string): Promise<UserRecord | null> {
     console.log('authServices.getUserByEmail', email)
     try {
-      const userFound = await admin.auth().getUserByEmail(email)
+      const userFound = await getAuth().getUserByEmail(email)
       return userFound
     } catch (error) {
       if (error.code === 'auth/user-not-found') return Promise.resolve(null)
@@ -26,7 +25,7 @@ export const authServices = {
   },
   async getUser(uid: string): Promise<UserRecord> {
     console.log('authServices.getUser', uid)
-    return admin.auth().getUser(uid)
+    return getAuth().getUser(uid)
   },
 }
 
@@ -42,7 +41,7 @@ export async function authenticate(req: AuthenticatedRequest, res: Response, nex
   }
   try {
     const idToken = req.headers.authorization.split('Bearer ')[1]
-    const decodedIdToken = await admin.auth().verifyIdToken(idToken)
+    const decodedIdToken = await getAuth().verifyIdToken(idToken)
     req.user = decodedIdToken
     console.log('Authorized', { decodedIdToken })
     next()

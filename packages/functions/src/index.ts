@@ -1,4 +1,4 @@
-import * as admin from 'firebase-admin'
+import { initializeApp } from 'firebase-admin/app'
 import api from './api/app'
 import * as _ from 'lodash'
 import { onAuthUserCreated } from './profile'
@@ -9,12 +9,12 @@ import { firestoreServices } from './services/firestore-service'
 import { IUser } from './types/types'
 
 // Every service in src/ (firestore-service.ts, auth-service.ts...) calls
-// admin.firestore()/admin.auth() assuming a default app already exists, but
-// nothing was ever calling admin.initializeApp() - masked until now because
+// getFirestore()/getAuth() assuming a default app already exists, but
+// nothing was ever calling initializeApp() - masked until now because
 // both HTTPS functions return 403 in production before reaching this code
 // (see CLAUDE.md), and nothing exercised onUserDeleted/initializeUser
 // end-to-end either.
-admin.initializeApp()
+initializeApp()
 
 const region = 'europe-west1'
 

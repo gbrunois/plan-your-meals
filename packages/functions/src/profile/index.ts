@@ -1,4 +1,4 @@
-import * as admin from 'firebase-admin'
+import { getFirestore } from 'firebase-admin/firestore'
 import { DocumentReference } from '@google-cloud/firestore'
 import { UserRecord } from 'firebase-admin/auth'
 
@@ -31,7 +31,7 @@ export function onAuthUserCreated(user: UserRecord | AuthUserEvent) {
             created_date: new Date(),
           })
           .then(() => {
-            return admin.firestore().runTransaction(async (t) => {
+            return getFirestore().runTransaction(async (t) => {
               await firestoreServices.createPlanningSharing(userData, newPlanningRef, true, t)
               await firestoreServices.createUser(userData.uid, newPlanningRef, t)
               await firestoreServices.createUserSharing(userData, newPlanningRef, true, userData.displayName, t)
