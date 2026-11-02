@@ -1,6 +1,5 @@
 import { initializeApp } from 'firebase-admin/app'
 import api from './api/app'
-import * as _ from 'lodash'
 import { onAuthUserCreated } from './profile'
 import { onRequest } from 'firebase-functions/v2/https'
 import { onDocumentDeleted } from 'firebase-functions/v2/firestore'
