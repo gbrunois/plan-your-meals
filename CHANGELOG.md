@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.3.0](https://github.com/gbrunois/plan-your-meals/compare/v1.2.0...v1.3.0) (2026-11-02)
+
+
+### Features
+
+* **front:** add bottom navigation bar with shopping list and recipes placeholders ([#248](https://github.com/gbrunois/plan-your-meals/issues/248)) ([663688f](https://github.com/gbrunois/plan-your-meals/commit/663688ffae1d3f9c6c6b33f335c806036334d4c1))
+
+
+### Bug Fixes
+
+* **front:** prevent calendar from overflowing the screen width ([#247](https://github.com/gbrunois/plan-your-meals/issues/247)) ([38bac84](https://github.com/gbrunois/plan-your-meals/commit/38bac846ee02f5efc4c4c7f146e39f4f065c5189))
+* **functions:** regenerate stale package-lock.json for Cloud Build ([#253](https://github.com/gbrunois/plan-your-meals/issues/253)) ([7d931f3](https://github.com/gbrunois/plan-your-meals/commit/7d931f3d982a0215270316702e4af2452dcaf8b6))
+
 ## [1.2.0](https://github.com/gbrunois/plan-your-meals/compare/v1.1.1...v1.2.0) (2026-11-01)
 
 
