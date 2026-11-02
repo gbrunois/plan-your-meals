@@ -1,4 +1,6 @@
-import admin = require('firebase-admin')
+import { App, deleteApp } from 'firebase-admin/app'
+import { getFirestore } from 'firebase-admin/firestore'
+import { getAuth } from 'firebase-admin/auth'
 import { config as loadEnvFile } from 'dotenv'
 import axios from 'axios'
 import { firestoreServices } from '../../src/services/firestore-service'
@@ -9,11 +11,11 @@ import { initFirebaseApp, waitDocumentExists, DEFAULT_TIMEOUT, functionsBaseUrl,
 // idempotency and the missing-auth-header case, which that helper doesn't.
 // There's no Auth trigger wiring `initializeUser` up automatically (see
 // CLAUDE.md's "New user bootstrap" section), so a plain
-// `app.auth().createUser()` never reaches it on its own.
+// `getAuth(app).createUser()` never reaches it on its own.
 const FAKE_USER_NAME = 'Geoffrey'
 
 describe('initializeUser (HTTPS function)', () => {
-  let app: admin.app.App
+  let app: App
   let apiUrl: string
   let fakeUserEmail: string
 
@@ -31,12 +33,12 @@ describe('initializeUser (HTTPS function)', () => {
   })
 
   afterAll(async () => {
-    await app.firestore().terminate()
-    await app.delete()
+    await getFirestore(app).terminate()
+    await deleteApp(app)
   })
 
   it('creates the user doc, planning and owner sharing', async () => {
-    const newUser = await app.auth().createUser({
+    const newUser = await getAuth(app).createUser({
       email: fakeUserEmail,
       displayName: FAKE_USER_NAME,
     })
@@ -69,7 +71,7 @@ describe('initializeUser (HTTPS function)', () => {
   })
 
   it('is idempotent when called twice for the same user', async () => {
-    const newUser = await app.auth().createUser({
+    const newUser = await getAuth(app).createUser({
       email: fakeUserEmail,
       displayName: FAKE_USER_NAME,
     })
@@ -95,7 +97,7 @@ describe('initializeUser (HTTPS function)', () => {
   })
 
   it('rejects a request without an Authorization header', async () => {
-    const newUser = await app.auth().createUser({
+    const newUser = await getAuth(app).createUser({
       email: fakeUserEmail,
       displayName: FAKE_USER_NAME,
     })

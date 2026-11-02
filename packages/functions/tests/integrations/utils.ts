@@ -1,7 +1,8 @@
 /// <reference lib="dom" />
 
 import { DocumentSnapshot, DocumentReference } from '@google-cloud/firestore'
-import * as admin from 'firebase-admin'
+import { App, cert, initializeApp as initializeAdminApp } from 'firebase-admin/app'
+import { getAuth as getAdminAuth } from 'firebase-admin/auth'
 import axios from 'axios'
 import { authServices } from '../../src/services/auth-service'
 import { firestoreServices } from '../../src/services/firestore-service'
@@ -100,7 +101,7 @@ export function initFirebaseApp() {
     // FIREBASE_AUTH_EMULATOR_HOST (set by `firebase emulators:exec`) make the
     // Admin SDK talk to the local emulators instead of a real project.
     const projectId = process.env.GCLOUD_PROJECT || EMULATOR_PROJECT_ID
-    const emulatorApp = admin.initializeApp({ projectId })
+    const emulatorApp = initializeAdminApp({ projectId })
     const clientApp = firebase.initializeApp({ apiKey: 'demo-api-key', projectId })
     if (process.env.FIREBASE_AUTH_EMULATOR_HOST) {
       connectAuthEmulator(getAuth(clientApp), `http://${process.env.FIREBASE_AUTH_EMULATOR_HOST}`)
@@ -108,8 +109,8 @@ export function initFirebaseApp() {
     return emulatorApp
   }
 
-  const app = admin.initializeApp({
-    credential: admin.credential.cert({
+  const app = initializeAdminApp({
+    credential: cert({
       projectId: process.env.SA_PROJECT_ID,
       clientEmail: process.env.SA_CLIENT_EMAIL,
       privateKey: process.env.SA_PRIVATE_KEY,
@@ -137,13 +138,13 @@ export function functionsBaseUrl() {
 
 /**
  * Delete a user and everything `initializeUser` (see `createUser` below)
- * creates for them. `app.auth().deleteUser()` alone doesn't touch
+ * creates for them. `getAdminAuth(app).deleteUser()` alone doesn't touch
  * Firestore at all - there's no Auth trigger wired for 2nd-gen functions
  * (see CLAUDE.md's "New user bootstrap") - so this mirrors what
  * `onUserDeleted` (src/index.ts) does for the planning/sharings instead of
  * waiting on a cascade that never happens.
  */
-export async function deleteUsers(app: admin.app.App, ...userEmails: string[]) {
+export async function deleteUsers(app: App, ...userEmails: string[]) {
   return Promise.all(
     userEmails.map(async (userEmail) => {
       const authUser = await authServices.getUserByEmail(userEmail)
@@ -156,13 +157,13 @@ export async function deleteUsers(app: admin.app.App, ...userEmails: string[]) {
         }
         await firestoreServices.deleteUser(authUser.uid)
       }
-      await app.auth().deleteUser(authUser.uid)
+      await getAdminAuth(app).deleteUser(authUser.uid)
     }),
   )
 }
 
 export async function getIdToken(userId) {
-  const customToken = await admin.auth().createCustomToken(userId)
+  const customToken = await getAdminAuth().createCustomToken(userId)
   const userCredentials = await signInWithCustomToken(getAuth(), customToken)
   return userCredentials.user.getIdToken()
 }
@@ -189,11 +190,11 @@ export async function postWithRetry(reqUrl: string, data: unknown, options: Reco
 /**
  * Create an Auth user and initialize their Firestore profile (own
  * planning, owner sharing...) by explicitly calling the `initializeUser`
- * HTTPS function - `app.auth().createUser()` alone doesn't do this either,
+ * HTTPS function - `getAdminAuth(app).createUser()` alone doesn't do this either,
  * for the same reason `deleteUsers` above has to clean up explicitly.
  */
-export async function createUser(app: admin.app.App, email: string, displayName: string): Promise<User> {
-  const u = await app.auth().createUser({
+export async function createUser(app: App, email: string, displayName: string): Promise<User> {
+  const u = await getAdminAuth(app).createUser({
     email,
     displayName,
   })
