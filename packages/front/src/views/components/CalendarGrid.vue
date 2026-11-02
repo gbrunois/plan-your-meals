@@ -138,6 +138,7 @@ export default {
   align-items: center;
   gap: 16px;
   width: 100%;
+  min-width: 0;
   padding: 10px 16px;
   border-top: 1px solid rgba(var(--v-border-color), 0.08);
   text-align: left;
