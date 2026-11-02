@@ -4,8 +4,21 @@ import { DayMenu } from '@/api/days/day-menu'
 import { MealPeriod } from '@/api/days/meal-period.type'
 import { MenuDate } from '@/api/days/menu-date'
 import { daysService } from '@/services/days.service'
+import type { CalendarViewMode } from '@/services/days.service'
 import { Commit, Dispatch } from 'vuex'
 import { IState } from './types'
+
+const VIEW_MODE_STORAGE_KEY = 'calendarViewMode'
+
+function loadViewMode(): CalendarViewMode {
+  try {
+    return localStorage.getItem(VIEW_MODE_STORAGE_KEY) === 'month'
+      ? 'month'
+      : 'week'
+  } catch {
+    return 'week'
+  }
+}
 
 const initialState: IState = {
   beginDate: daysService.getNow(),
@@ -14,6 +27,7 @@ const initialState: IState = {
   watchingDays: [],
   openedDay: null,
   status: 'OK',
+  viewMode: loadViewMode(),
 }
 const mutations = {
   saving(state: IState) {
@@ -24,6 +38,14 @@ const mutations = {
   },
   savedFailed(state: IState) {
     state.status = 'Failed'
+  },
+  setViewMode(state: IState, viewMode: CalendarViewMode) {
+    state.viewMode = viewMode
+    try {
+      localStorage.setItem(VIEW_MODE_STORAGE_KEY, viewMode)
+    } catch {
+      // storage unavailable: the choice just won't survive a reload
+    }
   },
   update(
     state: IState,
@@ -208,17 +230,20 @@ const getters = {
   beginDate: (state: IState) => {
     return state.beginDate
   },
+  endDate: (state: IState) => {
+    return state.endDate
+  },
   isLoading: (state: IState) => {
     return state.isLoading
   },
   openedDay: (state: IState) => {
     return state.openedDay
   },
+  viewMode: (state: IState) => {
+    return state.viewMode
+  },
   status: (state: IState) => {
     return state.status
-  },
-  currentPeriod: (state: IState) => {
-    return `${state.beginDate.toShortFormat()} - ${state.endDate.toShortFormat()}`
   },
 }
 

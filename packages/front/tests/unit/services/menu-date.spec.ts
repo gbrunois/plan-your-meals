@@ -22,4 +22,11 @@ describe('MenuDate', () => {
       expect(aMenuDate.toShortFormat()).toBe('1er janvier')
     })
   })
+
+  describe('toMonthFormat', () => {
+    it('should return the month and the year', () => {
+      const aMenuDate = new MenuDate('2012-01-01')
+      expect(aMenuDate.toMonthFormat()).toBe('janvier 2012')
+    })
+  })
 })

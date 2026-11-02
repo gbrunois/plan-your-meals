@@ -1,20 +1,23 @@
 import store from '@/store'
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw, RouteLocationNormalized } from 'vue-router'
-import DayPage from './views/DayPage.vue'
 import MyPlanningsPage from './views/MyPlannings.vue'
 import PrivacyPolicyPage from './views/PrivacyPolicy.vue'
 import SettingsPage from './views/Settings.vue'
 import SharingsPage from './views/Sharings.vue'
 import SignInPage from './views/SignIn.vue'
 import TermsOfServicePage from './views/TermsOfService.vue'
-import WeekPage from './views/WeekPage.vue'
+import CalendarPage from './views/CalendarPage.vue'
+import ShoppingListPage from './views/ShoppingListPage.vue'
+import RecipesPage from './views/RecipesPage.vue'
 
 import {
   SIGNIN_PAGE_NAME,
   WEEK_PAGE_NAME,
   DEFAULT_MAIN_PAGE_PATH,
   DEFAULT_MAIN_PAGE_NAME,
+  SHOPPING_LIST_PAGE_NAME,
+  RECIPES_PAGE_NAME,
 } from './router-names'
 
 const routes: Array<RouteRecordRaw> = [
@@ -34,35 +37,43 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: DEFAULT_MAIN_PAGE_PATH,
     name: DEFAULT_MAIN_PAGE_NAME,
-    component: WeekPage,
+    component: CalendarPage,
     meta: {
       title: 'Plan your meals',
       authRequired: true,
-      showToolbarExtension: true,
-      navigationComponent: 'week-navigation',
+      isCalendar: true,
+      showBottomNav: true,
     },
   },
   {
     path: '/week/:year/:month/:day',
     name: WEEK_PAGE_NAME,
-    component: WeekPage,
+    component: CalendarPage,
     meta: {
       title: 'Plan your meals',
       authRequired: true,
-      showToolbarExtension: true,
-      navigationComponent: 'week-navigation',
+      isCalendar: true,
+      showBottomNav: true,
     },
   },
   {
-    path: '/day/:year/:month/:day',
-    name: 'day',
-    component: DayPage,
+    path: '/shopping-list',
+    name: SHOPPING_LIST_PAGE_NAME,
+    component: ShoppingListPage,
     meta: {
-      title: 'Plan your meals',
+      title: 'Liste de courses',
       authRequired: true,
-      showBackButton: true,
-      showToolbarExtension: true,
-      navigationComponent: 'day-navigation',
+      showBottomNav: true,
+    },
+  },
+  {
+    path: '/recipes',
+    name: RECIPES_PAGE_NAME,
+    component: RecipesPage,
+    meta: {
+      title: 'Recettes',
+      authRequired: true,
+      showBottomNav: true,
     },
   },
   {

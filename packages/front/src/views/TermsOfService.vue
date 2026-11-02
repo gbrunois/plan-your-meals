@@ -1,8 +1,10 @@
 <template>
-  <v-row class="ma-2 fill-height">
-    <v-col>
-      <!-- eslint-disable-next-line vue/no-v-html -- content is our own static policy HTML fetched from public/policies/, not user input -->
-      <div v-html="content"></div>
+  <v-row class="fill-height align-start" no-gutters>
+    <v-col class="pa-0">
+      <v-card rounded="lg" elevation="1" class="pa-4">
+        <!-- eslint-disable-next-line vue/no-v-html -- content is our own static policy HTML fetched from public/policies/, not user input -->
+        <div v-html="content"></div>
+      </v-card>
     </v-col>
   </v-row>
 </template>

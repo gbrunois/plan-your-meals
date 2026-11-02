@@ -43,7 +43,63 @@ jobs:
       - name: Build
         run: npm run build
 
-  # push on develop -> `dev` environment, push on master -> `prod`. Each
+  # Opens/updates the "release PR" (version bump + CHANGELOG from conventional
+  # commits) on every push to master. Merging that PR creates the tag + GitHub
+  # release, and `release_created` then unlocks the prod deploy below. Kept in
+  # this workflow (rather than a separate `on: release` one) because releases
+  # created with GITHUB_TOKEN don't trigger other workflows.
+  release-please:
+    needs: verify
+    if: github.event_name == 'push' && github.ref_name == 'master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+    steps:
+      - uses: googleapis/release-please-action@v5
+        id: release
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  # The release commit only exists on master, so once a release is created,
+  # opens a master -> develop PR to bring it back (nothing happens if develop
+  # already has it or such a PR is open). It must be merged with a *merge commit* (squash/rebase would rewrite the SHAs
+  # and make the branches diverge). PRs opened with GITHUB_TOKEN don't trigger
+  # workflows, so checks won't run on it.
+  sync-develop:
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Open master -> develop PR if develop is behind
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          behind=$(git rev-list --count origin/develop..origin/master)
+          if [ "$behind" = "0" ]; then
+            echo "develop is up to date"
+            exit 0
+          fi
+          if [ -n "$(gh pr list --base develop --head master --state open --json number --jq '.[].number')" ]; then
+            echo "sync PR already open"
+            exit 0
+          fi
+          gh pr create --base develop --head master \
+            --title "chore: sync master into develop" \
+            --body "develop is $behind commit(s) behind master. Merge with a **merge commit** (not squash/rebase) so both branches keep the same history."
+
+  # push on develop -> `dev` environment, release created on master -> `prod`. Each
   # GitHub environment holds the same secret names, with that project's values:
   #   FIREBASERC      content of .firebaserc (has both aliases)
   #   FRONT_ENV       content of packages/front/.env.<development|production>
@@ -52,8 +108,12 @@ jobs:
   # The env files are gitignored (public repo), so they are rebuilt from the
   # secrets before building.
   deploy:
-    needs: verify
-    if: github.event_name == 'push'
+    needs: [verify, release-please]
+    if: >-
+      always() && needs.verify.result == 'success' &&
+      github.event_name == 'push' &&
+      (github.ref_name == 'develop' ||
+      needs.release-please.outputs.release_created == 'true')
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
     env:

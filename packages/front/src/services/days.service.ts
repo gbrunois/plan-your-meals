@@ -8,6 +8,8 @@ dayjs.extend(weekday)
 
 const FORMAT = 'YYYY-MM-DD'
 
+export type CalendarViewMode = 'month' | 'week'
+
 function findDay(days: DayMenu[], date: string): DayMenu | undefined {
   return days.find((d) => d.date.toString() === date)
 }
@@ -55,6 +57,45 @@ class DaysService {
   public getNextStartDayOfWeek(date: MenuDate): MenuDate {
     return new MenuDate(
       dayjs(date.toString(), FORMAT).weekday(7).format(FORMAT)
+    )
+  }
+  /**
+   * Days to display for the given view mode: the 7 days starting at `date`
+   * in week mode, every whole week touching the month of `date` in month mode.
+   */
+  public getPeriod(
+    date: MenuDate,
+    viewMode: CalendarViewMode
+  ): { beginDate: MenuDate; endDate: MenuDate } {
+    if (viewMode === 'week') {
+      return {
+        beginDate: date,
+        endDate: new MenuDate(
+          dayjs(date.toString(), FORMAT).add(6, 'day').format(FORMAT)
+        ),
+      }
+    }
+    const day = dayjs(date.toString(), FORMAT)
+    return {
+      beginDate: this.getFirstDayOfWeek(
+        new MenuDate(day.startOf('month').format(FORMAT))
+      ),
+      endDate: this.getLastDayOfWeek(
+        new MenuDate(day.endOf('month').format(FORMAT))
+      ),
+    }
+  }
+  /**
+   * Move `date` by one period (a week or a month depending on the view mode).
+   * Month moves are clamped to the target month's last day (31 Jan -> 28 Feb).
+   */
+  public shiftPeriod(
+    date: MenuDate,
+    direction: 1 | -1,
+    viewMode: CalendarViewMode
+  ): MenuDate {
+    return new MenuDate(
+      dayjs(date.toString(), FORMAT).add(direction, viewMode).format(FORMAT)
     )
   }
   public getPreviousDay(date: MenuDate): MenuDate {

@@ -39,14 +39,34 @@
         </div>
       </v-list>
     </v-navigation-drawer>
-    <v-app-bar fixed app dark color="primary" :extended="showToolbarExtension">
+    <v-app-bar fixed app dark color="primary">
       <v-app-bar-nav-icon @click.stop="onToolbarButtonClick">
         <v-icon>{{ menuIcon }}</v-icon>
       </v-app-bar-nav-icon>
-      <v-toolbar-title class="text-xs-center">
+      <v-toolbar-title v-if="!isCalendar" class="text-xs-center">
         {{ toolbarTitle }}
       </v-toolbar-title>
       <v-spacer></v-spacer>
+      <template v-if="isCalendar">
+        <v-btn
+          icon="mdi-chevron-left"
+          variant="tonal"
+          size="small"
+          aria-label="Période précédente"
+          @click="goToPreviousPeriod()"
+        ></v-btn>
+        <v-btn class="mx-2" variant="tonal" @click="onTodayButtonClick">
+          Aujourd'hui
+        </v-btn>
+        <v-btn
+          icon="mdi-chevron-right"
+          variant="tonal"
+          size="small"
+          aria-label="Période suivante"
+          @click="goToNextPeriod()"
+        ></v-btn>
+        <v-spacer></v-spacer>
+      </template>
       <v-btn
         v-if="showSaveButton"
         small
@@ -55,27 +75,33 @@
         @click.stop="onSaveButtonClick"
         >Enregistrer</v-btn
       >
-      <v-app-bar-nav-icon
-        v-if="showToolbarExtension"
-        @click.stop="onTodayButtonClick"
-      >
-        <v-icon>mdi-calendar</v-icon>
-      </v-app-bar-nav-icon>
-      <template #extension>
-        <v-row v-if="showToolbarExtension" no-gutters>
-          <v-col cols="12">
-            <component :is="currentTabComponent"></component>
-          </v-col>
-          <v-col class="flex-progress-linear" cols="12">
-            <v-progress-linear
-              v-if="isLoading"
-              class="mx-0 my-1"
-              :indeterminate="true"
-              color="white"
-            ></v-progress-linear>
-          </v-col>
-        </v-row>
-      </template>
+      <v-menu v-if="isCalendar">
+        <template #activator="{ props }">
+          <v-btn
+            icon="mdi-dots-horizontal"
+            aria-label="Options"
+            v-bind="props"
+          ></v-btn>
+        </template>
+        <v-list>
+          <v-list-subheader>Affichage</v-list-subheader>
+          <v-list-item
+            v-for="option in viewModes"
+            :key="option.value"
+            :prepend-icon="option.icon"
+            :title="option.title"
+            :active="option.value === viewMode"
+            @click="setViewMode(option.value)"
+          ></v-list-item>
+        </v-list>
+      </v-menu>
+      <v-progress-linear
+        v-if="isLoading"
+        absolute
+        location="bottom"
+        indeterminate
+        color="white"
+      ></v-progress-linear>
     </v-app-bar>
     <v-snackbar v-model="showSyncErrorSnackbar" color="error" timeout="8000">
       {{ syncErrorMessage }}
@@ -104,16 +130,15 @@
 
 <script>
 import { version } from '../../package.json'
-import DayNavigation from '../views/components/DayNavigation.vue'
-import WeekNavigation from '../views/components/WeekNavigation.vue'
-import { DEFAULT_MAIN_PAGE_PATH, DEFAULT_MAIN_PAGE_NAME } from '@/router-names'
+import { DEFAULT_MAIN_PAGE_PATH } from '@/router-names'
+import { daysService } from '@/services/days.service'
+import {
+  getDateFromUrlParamsOrToday,
+  toCalendarRoute,
+} from '@/services/router.service'
 
 export default {
   name: 'AppNavigation',
-  components: {
-    weekNavigation: WeekNavigation,
-    dayNavigation: DayNavigation,
-  },
   data() {
     return {
       drawer: false,
@@ -121,6 +146,10 @@ export default {
       dialogHasPendingRequests: false,
       showSyncErrorSnackbar: false,
       syncErrorMessage: '',
+      viewModes: [
+        { value: 'month', title: 'Vue mois', icon: 'mdi-calendar-month' },
+        { value: 'week', title: 'Vue semaine', icon: 'mdi-calendar-week' },
+      ],
     }
   },
   computed: {
@@ -140,14 +169,11 @@ export default {
     toolbarTitle() {
       return this.$route.meta.title
     },
-    showToolbarExtension() {
-      return this.$route.meta.showToolbarExtension === true
+    isCalendar() {
+      return this.$route.meta.isCalendar === true
     },
-    /**
-     * Return the sub navigator component
-     */
-    currentTabComponent() {
-      return this.$route.meta.navigationComponent
+    viewMode() {
+      return this.$store.getters['days/viewMode']
     },
     showSaveButton() {
       const storeName = this.$route.meta.storeName
@@ -184,11 +210,22 @@ export default {
       }
     },
     onTodayButtonClick() {
-      if (this.$route.name !== DEFAULT_MAIN_PAGE_NAME) {
-        this.$router.push({
-          path: DEFAULT_MAIN_PAGE_PATH,
-        })
-      }
+      this.$router.push(toCalendarRoute(daysService.getNow()))
+    },
+    goToPreviousPeriod() {
+      this.shiftPeriod(-1)
+    },
+    goToNextPeriod() {
+      this.shiftPeriod(1)
+    },
+    shiftPeriod(direction) {
+      const date = getDateFromUrlParamsOrToday(this.$route.params)
+      this.$router.push(
+        toCalendarRoute(daysService.shiftPeriod(date, direction, this.viewMode))
+      )
+    },
+    setViewMode(viewMode) {
+      this.$store.commit('days/setViewMode', viewMode)
     },
     async onSaveButtonClick() {
       const storeName = this.$route.meta.storeName
@@ -234,9 +271,3 @@ export default {
   },
 }
 </script>
-
-<style scoped>
-.flex-progress-linear {
-  height: 7px;
-}
-</style>
